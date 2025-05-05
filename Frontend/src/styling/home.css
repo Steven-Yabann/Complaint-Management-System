@@ -8,8 +8,8 @@
   .hero-section {
     text-align: center;
     padding: 4rem 0;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    color: white;
+    background: linear-gradient(135deg, #e43939, #fecc02);
+    color: rgb(255, 255, 255);
     border-radius: 10px;
     margin: 2rem 0;
   }
@@ -42,12 +42,12 @@
   }
   
   .btn.primary {
-    background-color: #e74c3c;
+    background-color: #473ce7;
     color: white;
   }
   
   .btn.primary:hover {
-    background-color: #c0392b;
+    background-color: #ff0000;
   }
   
   .btn.secondary {
@@ -57,7 +57,7 @@
   }
   
   .btn.secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 0, 0, 0.568);
   }
   
   /* Features section */
@@ -81,7 +81,7 @@
   .feature-card {
     padding: 2rem;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #f4e9d5;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
   }
@@ -96,13 +96,13 @@
   }
   
   .feature-card h3 {
-    color: #3498db;
+    color: #db3434;
     margin-bottom: 1rem;
   }
   
   /* About section */
   .about-section {
-    background-color: #f0f8ff;
+    background-color: #f4e9d5;
     padding: 2rem;
     border-radius: 8px;
     margin: 3rem 0;
