@@ -1,0 +1,41 @@
+body{
+    background-color: rgba(247, 144, 10, 0.872);
+}
+.main-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+margin:5rem auto;
+max-width: 20rem;
+min-height:25rem;
+padding:0 20px;
+text-align: center;
+border-radius: 20%;
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+.input{
+    border:1px solid rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 1.2rem;
+    margin: 1vh;
+    background-color:rgb(254, 246, 235);
+    transition: 0.1s ease-in-out;
+}
+.input:focus{
+    outline:none;
+    border-color: rgba(247, 144, 10, 0.872);
+    box-shadow: 0 0 10px rgba(247, 144, 10, 0.872);
+}
+.register-button{
+    margin-top:1rem;
+    padding:1vh;
+    font-size:1rem;
+    border: none; 
+    border-radius: 5px; 
+    background-color: #4CAF50; 
+    color: rgb(0, 0, 0); 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
