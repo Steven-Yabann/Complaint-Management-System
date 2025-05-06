@@ -18,9 +18,9 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/login', authRoutes)
+app.use('/auth', authRoutes)
 
-app.use((res, req, next) => {
+app.use((req, res, next) => {
     res.status(404).json({message: "Route not found"});
 })
 
