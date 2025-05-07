@@ -1,0 +1,147 @@
+/* Main Container */
+.auth-container {
+    display: flex;
+    width: 900px;
+    height: 650px;
+    margin: 0rem auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Image Panel */
+.image-panel {
+    flex: 1;
+    overflow: hidden;
+}
+
+.image-panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+/* Form Panel */
+.form-panel {
+    flex: 1;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Layout Switching */
+.login-view {
+    flex-direction: row;
+}
+
+.register-view {
+    flex-direction: row-reverse;
+}
+
+/* Form Styles */
+h1 {
+    margin-bottom: 2rem;
+    color: #333;
+    font-size: 3rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.input-group input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    padding: 8px 0;
+    font-size: 1rem;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+/* Animated underline effect */
+.input-group input:focus {
+    border-bottom-color: transparent; /* Hide default border */
+}
+
+.input-group::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #f7901e;
+    transition: width 0.3s ease;
+}
+
+.input-group:focus-within::after {
+    width: 100%;
+}
+
+/* Keep your icon styles */
+.input-group span {
+    margin-right: 10px;
+    color: #777;
+    font-size: 1.2rem;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 6px;
+    background: #f7901e;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: ease-in-out 0.3s;
+}
+
+.primary-btn:hover {
+    background: #e07e0c;
+}
+
+.form-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.form-footer p {
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.switch-btn {
+    background: none;
+    border: none;
+    color: #f7901e;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.switch-btn:hover {
+    color: #e07e0c;
+}
+
+.error-message {
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    width: 100%;
+    padding-left: 1.5rem;
+}
+
+.input-group:has(+ .error-message) {
+    margin-bottom: 0.5rem;
+}
