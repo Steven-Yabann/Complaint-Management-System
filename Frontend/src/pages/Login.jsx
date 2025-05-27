@@ -63,6 +63,7 @@ const LoginPage = () => {
             </div>
 
             <div className="form-panel">
+                <Link to="/" className="back-home-btn">Home</Link>
                 <form className="login-form" onSubmit={handleSubmit}>
                     <h1>Welcome Back</h1>
                     <div className="input-group">

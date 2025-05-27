@@ -86,6 +86,7 @@ const RegisterPage = () => {
             </div>
 
             <div className="form-panel">
+                 <Link to="/" className="back-home-btn">Home</Link>
                 <form className="register-form" onSubmit={handleSubmit}>
                     <h1>Create Account</h1>
                     <div className="input-group">
