@@ -20,54 +20,72 @@
 
 .sidebar-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     padding: 0 20px;
 }
 
-.sidebar-header h2 {
-    font-size: 1.8em;
+.sidebar-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.profile-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ecf0f1;
+    margin-bottom: 10px;
+}
+
+.sidebar-profile h3 {
+    font-size: 1.1em;
     margin: 0;
-    color: #ecf0f1; /* Lighter color for text */
+    color: #ecf0f1;
 }
 
 .sidebar-links {
     list-style: none;
     padding: 0;
     margin: 0;
-    flex-grow: 1; /* Allows links to push logout to bottom if needed */
+    flex-grow: 1;
 }
 
 .sidebar-links li {
     margin-bottom: 10px;
 }
 
-.sidebar-links a, .sidebar-links button {
+.sidebar-links a,
+.sidebar-links button {
     display: block;
     color: white;
     text-decoration: none;
-    padding: 12px 20px;
-    font-size: 1.1em;
-    transition: background-color 0.3s ease;
+    padding: 12px 25px;
+    font-size: 1.05em;
+    transition: all 0.3s ease;
     border: none;
     background: none;
     width: 100%;
     text-align: left;
     cursor: pointer;
+    box-sizing: border-box; /* Critical */
+    border-left: 5px solid transparent; /* Reserve space */
 }
 
 .sidebar-links a:hover,
 .sidebar-links button:hover {
-    background-color: #34495e; /* Slightly lighter dark blue on hover */
-    border-left: 5px solid #2980b9; /* Accent border on hover */
-    padding-left: 15px; /* Adjust padding due to border */
+    background-color: #34495e;
+    border-left: 5px solid #2980b9;
+    padding-left: 20px;
 }
 
 .sidebar-links .logout-btn {
-    margin-top: auto; /* Pushes the logout button to the bottom */
-    border-top: 1px solid rgba(255,255,255,0.1); /* Separator line */
+    margin-top: auto; /* Pushes logout to bottom */
+    border-top: 1px solid rgba(255,255,255,0.1);
     padding-top: 20px;
 }
-
 /* Main Content Styling */
 .dashboard-main-content {
     flex-grow: 1; /* Takes up remaining space */
@@ -98,7 +116,7 @@
     background-color: white;
     padding: 25px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     transition: transform 0.2s ease-in-out;
 }
 
@@ -195,6 +213,72 @@
     color: #333;
 }
 
-.dashboard-widget.notifications{
-    grid-column:1;
+/* Enhanced Notifications Styling */
+.dashboard-widget.notifications {
+    grid-column: 1 / -1; /* Span full width across the grid */
+    display: flex;
+    flex-direction: column;
 }
+
+.notifications h2 {
+    margin-bottom: 10px;
+}
+
+.notifications ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 300px; /* Adjust based on your layout */
+    padding-right: 10px;
+}
+
+/* Scrollbar styling (optional) */
+.notifications ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications ul::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notifications ul::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.notifications li {
+    background-color: #fefefe;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-left: 5px solid #2980b9;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    font-size: 0.95em;
+    color: #333;
+    line-height: 1.4;
+    transition: transform 0.2s ease;
+}
+
+.notifications li:hover {
+    transform: translateX(5px);
+    border-left-color: #3498db;
+}
+
+/* Optional: Add time ago styles */
+.notifications li small {
+    display: block;
+    margin-top: 6px;
+    color: #999;
+    font-size: 0.85em;
+}     
+.profile-icon {
+    fill: #ecf0f1; /* Icon color */
+    margin-bottom: 10px;
+    transition: fill 0.3s ease;
+}
+
+.sidebar-profile:hover .profile-icon {
+    fill: #2980b9; /* Change color on hover */
+}  
