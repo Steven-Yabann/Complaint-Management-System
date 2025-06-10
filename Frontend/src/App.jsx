@@ -2,7 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/login';
 import Register from './pages/Register';
+import UserDashboard from './pages/userDash';
 
+const PrivateRoute = ({ children }) => {
+    const isAuthenticated = localStorage.getItem('token'); // Check for token
+    return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
 
@@ -13,6 +18,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login/>}/> 
         <Route path="/register" element={<Register/>}/>
+
+        <Route path="/dashboard" element={<PrivateRoute> <UserDashboard /> </PrivateRoute>}/>
+              
 
       </Routes>
     </Router>

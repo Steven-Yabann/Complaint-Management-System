@@ -1,52 +1,45 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import '../styling/login.css';
-import registerImg from '../assets/register.avif';
+import { Link, useNavigate } from "react-router-dom";
+import '../styling/login.css'; // Assuming your CSS is here
+import registerImg from '../assets/register.avif'; // Assuming your image is here
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
+        // --- IMPORTANT CHANGE: New fields based on User schema ---
         username: '',
         email: '',
         password: '',
         confirmPassword: ''
     });
     const [errors, setErrors] = useState({
-        username: '',
+        username:'',
         email: '',
         password: '',
         confirmPassword: ''
     });
-    // State to hold messages for the user (success/error from backend)
     const [registrationMessage, setRegistrationMessage] = useState('');
-    const navigate = useNavigate(); // Initialize useNavigate hook for redirection
+    const navigate = useNavigate();
 
-    // Handles changes in form input fields
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value
         });
-        // Clear previous error message for the field when user starts typing
         setErrors({
             ...errors,
             [name]: ''
         });
     };
 
-    // Performs client-side validation of the registration form data
     const validateRegister = () => {
         let valid = true;
-        const newErrors = { // Create a mutable copy of errors
+        const newErrors = { // Initialize all error messages to empty strings
             username: '', email: '', password: '', confirmPassword: ''
         };
 
-        // Validate Username
-        if (!formData.username.trim()) {
+        if (!formData.username) {
             newErrors.username = 'Username is required';
-            valid = false;
-        } else if (formData.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
             valid = false;
         }
 
@@ -77,53 +70,44 @@ const RegisterPage = () => {
             valid = false;
         }
 
-        setErrors(newErrors); // Update errors state
-        return valid; // Return overall validation status
+        setErrors(newErrors);
+        return valid;
     };
 
-    // Handles form submission
-    const handleSubmit = async (e) => { // Made async because we'll be using await for the fetch call
-        e.preventDefault(); // Prevent default form submission behavior (page reload)
-        setRegistrationMessage(''); // Clear any previous registration messages
-
-        const isValid = validateRegister(); // Run client-side validation
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setRegistrationMessage('');
+        const isValid = validateRegister();
 
         if (isValid) {
             try {
-                // --- Start: Backend API Call ---
-                const response = await fetch('http://localhost:4000/api/register', { // IMPORTANT: Use your backend URL and endpoint
-                    method: 'POST', // HTTP method for registration
+                const response = await fetch('http://localhost:4000/api/register', {
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json', // Tell the server we're sending JSON
+                        'Content-Type': 'application/json',
                     },
-                    // Send only the necessary data to the backend (username, email, password)
                     body: JSON.stringify({
+                        // --- IMPORTANT CHANGE: Send new fields ---
                         username: formData.username,
                         email: formData.email,
                         password: formData.password
                     }),
                 });
 
-                const data = await response.json(); // Parse the JSON response from the backend
+                const data = await response.json();
 
-                if (response.ok) { // Check if the HTTP status code is 2xx (success)
-                    setRegistrationMessage(data.message || 'Registration successful! Redirecting to login...');
-                    // Redirect to login page after a short delay for user to read message
+                if (response.ok) {
+                    setRegistrationMessage('Registration successful! Redirecting to login...');
                     setTimeout(() => {
                         navigate('/login');
                     }, 2000);
                 } else {
-                    // Handle errors from the backend (e.g., email/username already exists, invalid data)
-                    // The backend should send an error message in its JSON response
                     setRegistrationMessage(data.message || 'Registration failed. Please try again.');
-                    console.error('Registration failed on server:', data);
+                    console.error('Registration failed:', data);
                 }
-                // --- End: Backend API Call ---
-
             } catch (error) {
-                // Catch network errors or other unexpected issues during the fetch request
-                setRegistrationMessage('An error occurred during registration. Please check your network connection and try again.');
-                console.error('Error during fetch request:', error);
+                setRegistrationMessage('An error occurred during registration. Please check your network and try again.');
+                console.error('Network or unexpected error during registration:', error);
             }
         }
     };
@@ -138,35 +122,36 @@ const RegisterPage = () => {
                 <Link to="/" className="back-home-btn">Home</Link>
                 <form className="register-form" onSubmit={handleSubmit}>
                     <h1>Create Account</h1>
-                    {/* Display registration success/error messages */}
                     {registrationMessage && (
                         <div className={`message ${registrationMessage.includes('successful') ? 'success' : 'error'}`}>
                             {registrationMessage}
                         </div>
                     )}
-
+                    {/* --- IMPORTANT CHANGE: Add First Name Input --- */}
                     <div className="input-group">
                         <span>👤</span>
                         <input
                             type="text"
                             name="username"
                             placeholder="Username"
-                            value={formData.username}
+                            value={formData.firstName}
                             onChange={handleChange}
-                            autoComplete="username" // Helps browser autofill
+                            autoComplete="username"
                         />
                     </div>
                     {errors.username && <span className="error-message">{errors.username}</span>}
 
+
+                   
                     <div className="input-group">
                         <span>✉️</span>
                         <input
-                            type="email"
+                            type="email" // Use type="email" for better browser validation
                             name="email"
                             placeholder="Email"
                             value={formData.email}
                             onChange={handleChange}
-                            autoComplete="email" // Helps browser autofill
+                            autoComplete="email"
                         />
                     </div>
                     {errors.email && <span className="error-message">{errors.email}</span>}
@@ -179,7 +164,7 @@ const RegisterPage = () => {
                             placeholder="Password"
                             value={formData.password}
                             onChange={handleChange}
-                            autoComplete="new-password" // Helps browser autofill
+                            autoComplete="new-password"
                         />
                     </div>
                     {errors.password && <span className="error-message">{errors.password}</span>}
@@ -192,7 +177,7 @@ const RegisterPage = () => {
                             placeholder="Confirm Password"
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            autoComplete="new-password" // Helps browser autofill
+                            autoComplete="new-password"
                         />
                     </div>
                     {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
