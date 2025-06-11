@@ -2,11 +2,11 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styling/userDash.css';
 
-// Placeholder components (we'll create these in Step 4)
+
 const QuickActions = () => (
     <div className="dashboard-widget quick-actions">
         <h2>Quick Actions</h2>
-        <button className="primary-btn">File New Complaint</button>
+        <Link to="/ComplaintPage" className="primary-btn">File New Complaint</Link>
         <button className="secondary-btn">View All Complaints</button>
     </div>
 );
@@ -63,7 +63,7 @@ const UserDashboard = () => {
     </div>
     <ul className="sidebar-links">
         <li><Link to="/dashboard">Dashboard</Link></li>
-        <li><Link to="/file-complaint">File Complaint</Link></li>
+        <li><Link to="/ComplaintPage">File Complaint</Link></li>
         <li><Link to="/complaint-status">Complaint Status</Link></li>
         <li><Link to="/profile">Profile</Link></li>
         <li><Link to="/notifications">Notifications</Link></li>
