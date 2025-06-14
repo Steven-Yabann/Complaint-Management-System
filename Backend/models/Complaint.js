@@ -1,41 +1,46 @@
+// backend/models/Complaint.js
+
 const mongoose = require('mongoose');
 
 const ComplaintSchema = new mongoose.Schema({
-    submittedBy: { // Reference to the User who submitted the complaint
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'User', // Reference to the User model
         required: true
-    },
-    assignedTo: { // Reference to the User (staff) who is assigned the complaint
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: false, // Optional: might not be assigned immediately
-        default: null
     },
     title: {
         type: String,
-        required: true,
-        trim: true
+        required: [true, 'Please add a complaint title'],
+        trim: true,
+        maxlength: [100, 'Title cannot be more than 100 characters']
+    },
+    department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department', // Reference to the Department model
+        required: [true, 'Please select a department/building']
     },
     description: {
         type: String,
-        required: true,
-        trim: true
+        required: [true, 'Please add a description'],
+        maxlength: [500, 'Description cannot be more than 500 characters'] // Matches your frontend MAX_DESCRIPTION_LENGTH
     },
-    status: { // e.g., 'Pending', 'In Progress', 'Resolved', 'Closed', 'Rejected'
+    status: {
         type: String,
-        enum: ['Pending', 'In Progress', 'Resolved', 'Closed', 'Rejected'],
-        default: 'Pending'
+        enum: ['Open', 'In Progress', 'Resolved', 'Closed'],
+        default: 'Open'
     },
-    priority: { // e.g., 'Low', 'Medium', 'High', 'Urgent'
+    priority: {
         type: String,
-        enum: ['low', 'Medium', 'High', 'Urgent'],
-        default: 'Medium'
+        enum: ['Low', 'Medium', 'High', 'Urgent'],
+        default: 'Low'
     },
-    attachments: { // Array of strings (e.g., URLs to uploaded files)
-        type: [String],
-        default: []
-    },
+    attachments: [
+        {
+            filename: String,
+            filepath: String, // Path where the file is stored on the server
+            mimetype: String
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
@@ -46,7 +51,7 @@ const ComplaintSchema = new mongoose.Schema({
     }
 });
 
-// Update `updatedAt` whenever the document is updated
+// Update 'updatedAt' field on save
 ComplaintSchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     next();

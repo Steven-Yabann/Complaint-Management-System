@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const express = require('express');
-const {loginUser} = require('../Controller/auth_controller');
+const {loginUser} = require('../controllers/auth_controller');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const User = require('../models/User'); 
