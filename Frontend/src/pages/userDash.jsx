@@ -62,18 +62,25 @@ const UserDashboard = () => {
     const [userComplaints, setUserComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [username, setUsername] = useState('User');
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('username');
         navigate('/login');
     };
 
     // Authentication check should probably be higher up or use context/router protection
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const storedUsername = localStorage.getItem('username');
         if (!token) {
             navigate('/login');
             return;
+        }
+
+        if(storedUsername){
+            setUsername(storedUsername);
         }
 
         const fetchUserComplaints = async () => {
@@ -137,7 +144,7 @@ const UserDashboard = () => {
             {/* Main Content */}
             <main className="dashboard-main-content">
                 <header className="main-content-header">
-                    <h1>Welcome, User!</h1> {/* This will dynamically show the username later */}
+                    <h1>Welcome, {username}</h1> 
                 </header>
 
                 <section className="dashboard-widgets-grid">
