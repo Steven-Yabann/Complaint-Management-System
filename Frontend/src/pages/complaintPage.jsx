@@ -1,149 +1,164 @@
+// frontend/src/pages/ComplaintPage.jsx
+
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '../styling/complaintPage.css'; 
+import { useNavigate, useParams } from 'react-router-dom'; // NEW: Import useParams
+import '../styling/complaintPage.css'; // Assuming you have this CSS file
 
 const ComplaintPage = () => {
+    const { id } = useParams(); // Get ID from URL for edit mode
     const navigate = useNavigate();
+
+    // Determine if we are in edit mode
+    const isEditMode = !!id; // True if ID exists, false otherwise
+
     const [formData, setFormData] = useState({
         title: '',
-        department: '', 
+        department: '',
         description: '',
-        status: 'Open', 
-        priority: 'Low',
+        status: 'Open', // Default status for new complaints
+        priority: 'Medium', // Default priority for new complaints
+        attachments: null // For file input
     });
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [departments, setDepartments] = useState([]); // To store fetched departments
-    const [errors, setErrors] = useState({});
-    const [submitMessage, setSubmitMessage] = useState('');
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [complaintId, setComplaintId] = useState('');
 
-    const MAX_FILES = 5;
-    const MAX_FILE_SIZE_MB = 10; // Total size
-    const MAX_DESCRIPTION_LENGTH = 500; // Example length from wireframe, adjust as needed
+    const [existingAttachments, setExistingAttachments] = useState([]); // To display/manage existing files during edit
+    const [departments, setDepartments] = useState([]);
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(null); // For fetching initial complaint data in edit mode
 
     // --- Fetch Departments on Component Mount ---
     useEffect(() => {
         const fetchDepartments = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
             try {
-                const response = await fetch('http://localhost:4000/api/departments', {
+                const response = await fetch('http://localhost:4000/api/departments', { // Assuming this endpoint exists
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 if (response.ok) {
                     const data = await response.json();
                     setDepartments(data.data);
                 } else {
-                    console.error('Failed to fetch departments:', response.statusText);
-                    setErrors(prev => ({ ...prev, department: 'Could not load departments.' }));
+                    console.error('Failed to fetch departments:', await response.json());
                 }
-            } catch (error) {
-                console.error('Network error fetching departments:', error);
-                setErrors(prev => ({ ...prev, department: 'Network error loading departments.' }));
+            } catch (err) {
+                console.error('Network error fetching departments:', err);
             }
         };
         fetchDepartments();
-    }, []); // Empty dependency array means this runs once on mount
+    }, [navigate]);
+
+    // --- Fetch Complaint Data if in Edit Mode ---
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchComplaintData = async () => {
+                setLoading(true);
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    navigate('/login');
+                    return;
+                }
+                try {
+                    const response = await fetch(`http://localhost:4000/api/complaints/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const complaint = data.data;
+
+                        setFormData({
+                            title: complaint.title || '',
+                            department: complaint.department ? complaint.department._id : '', // Use _id for select
+                            description: complaint.description || '',
+                            status: complaint.status || 'Open',
+                            priority: complaint.priority || 'Medium',
+                            attachments: null // attachments input is cleared for new uploads
+                        });
+                        setExistingAttachments(complaint.attachments || []); // Store existing attachments to display
+                    } else {
+                        const errorData = await response.json();
+                        setFetchError(errorData.message || 'Failed to load complaint for editing.');
+                        console.error('Failed to fetch complaint for edit:', errorData);
+                    }
+                } catch (err) {
+                    setFetchError('Network error: Could not load complaint data.');
+                    console.error('Network error fetching complaint for edit:', err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchComplaintData();
+        }
+    }, [id, isEditMode, navigate]); // Depend on ID and edit mode
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error for the field being changed
-        setErrors(prev => ({ ...prev, [name]: '' }));
-    };
-
-    const handleSmartSuggestion = (suggestion) => {
-        setFormData(prev => ({ ...prev, title: suggestion }));
-        setErrors(prev => ({ ...prev, title: '' }));
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
     const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        const newFiles = [...selectedFiles];
-        let currentTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0); // Bytes
-
-        files.forEach(file => {
-            if (newFiles.length < MAX_FILES) {
-                if ((currentTotalSize + file.size) / (1024 * 1024) <= MAX_FILE_SIZE_MB) {
-                    newFiles.push(file);
-                    currentTotalSize += file.size;
-                } else {
-                    setErrors(prev => ({ ...prev, files: `Total file size cannot exceed ${MAX_FILE_SIZE_MB}MB.` }));
-                }
-            } else {
-                setErrors(prev => ({ ...prev, files: `You can upload a maximum of ${MAX_FILES} files.` }));
-            }
+        setFormData({
+            ...formData,
+            attachments: e.target.files // FileList object
         });
-        setSelectedFiles(newFiles);
-        e.target.value = null; // Clear the input so same file can be selected again
-        setErrors(prev => ({ ...prev, files: '' })); // Clear file error on new selection
-    };
-
-    const handleRemoveFile = (index) => {
-        const newFiles = selectedFiles.filter((_, i) => i !== index);
-        setSelectedFiles(newFiles);
-        setErrors(prev => ({ ...prev, files: '' })); // Clear any previous file errors
-    };
-
-    const validateForm = () => {
-        let newErrors = {};
-        let isValid = true;
-
-        if (!formData.title.trim()) {
-            newErrors.title = 'Complaint Title is required.';
-            isValid = false;
-        }
-        if (!formData.department) {
-            newErrors.department = 'Department/Building is required.';
-            isValid = false;
-        }
-        if (!formData.description.trim()) {
-            newErrors.description = 'Complaint Details are required.';
-            isValid = false;
-        } else if (formData.description.length > MAX_DESCRIPTION_LENGTH) {
-            newErrors.description = `Description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters.`;
-            isValid = false;
-        }
-
-        setErrors(newErrors);
-        return isValid;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitMessage('');
-        setErrors({}); // Clear previous errors
-
-        if (!validateForm()) {
-            return;
-        }
-
+        setMessage('');
+        setLoading(true);
         const token = localStorage.getItem('token');
+
         if (!token) {
-            setSubmitMessage('You are not authenticated. Please log in.');
+            setMessage('You must be logged in to file a complaint.');
             navigate('/login');
+            setLoading(false);
             return;
         }
 
+        // Create FormData object for mixed data (text + files)
         const complaintData = new FormData();
         complaintData.append('title', formData.title);
         complaintData.append('department', formData.department);
         complaintData.append('description', formData.description);
         complaintData.append('status', formData.status);
-        complaintData.append('priority', formData.priority); // Include priority
+        complaintData.append('priority', formData.priority);
 
-        selectedFiles.forEach((file) => {
-            complaintData.append('attachments', file); // Append each file
-        });
+        // Append new attachments if selected
+        if (formData.attachments) {
+            for (let i = 0; i < formData.attachments.length; i++) {
+                complaintData.append('attachments', formData.attachments[i]);
+            }
+        }
+        // IMPORTANT: If you want to keep existing attachments AND add new ones,
+        // your backend must support that by appending to the array, not replacing.
+        // As per our current backend logic for PUT, if 'attachments' field is sent, it replaces.
+        // So, if no new files are selected, we simply don't append 'attachments' field,
+        // and the backend will keep the existing ones.
+
+        const url = isEditMode
+            ? `http://localhost:4000/api/complaints/${id}` // PUT for update
+            : 'http://localhost:4000/api/complaints'; // POST for new
+
+        const method = isEditMode ? 'PUT' : 'POST';
 
         try {
-            const response = await fetch('http://localhost:4000/api/complaints', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    // 'Content-Type': 'multipart/form-data' is NOT set here.
-                    // fetch does it automatically when using FormData.
+                    'Authorization': `Bearer ${token}`
+                    // IMPORTANT: Do NOT set 'Content-Type': 'multipart/form-data' here.
+                    // The browser sets it automatically with the correct boundary when you use FormData.
                 },
                 body: complaintData,
             });
@@ -151,154 +166,169 @@ const ComplaintPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setComplaintId(data.complaintId || 'Unknown');
-                setShowSuccessModal(true);
-                // Optionally clear the form after success
-                setFormData({
-                    title: '',
-                    department: '',
-                    description: '',
-                    status: 'Open',
-                    priority: 'Low',
-                });
-                setSelectedFiles([]);
+                setMessage(data.message || (isEditMode ? 'Complaint updated successfully!' : 'Complaint filed successfully!'));
+                setLoading(false);
+                // Optionally clear form for new complaint after submission
+                if (!isEditMode) {
+                    setFormData({
+                        title: '',
+                        department: '',
+                        description: '',
+                        status: 'Open',
+                        priority: 'Medium',
+                        attachments: null
+                    });
+                    setExistingAttachments([]); // Clear existing attachments display
+                }
+                // Redirect to dashboard or complaint status page after a short delay
+                setTimeout(() => {
+                    navigate('/viewComplaints');
+                }, 1500);
             } else {
-                setSubmitMessage(data.message || 'Failed to submit complaint. Please try again.');
-                console.error('Complaint submission error:', data);
+                setMessage(data.message || `Failed to ${isEditMode ? 'update' : 'file'} complaint.`);
+                setLoading(false);
+                console.error('API Error:', data);
             }
-        } catch (error) {
-            setSubmitMessage('Network error. Could not submit complaint.');
-            console.error('Network error during complaint submission:', error);
+        } catch (err) {
+            setMessage('Network error: Could not connect to the server.');
+            setLoading(false);
+            console.error('Network Error:', err);
         }
     };
 
-    return (
-        <div className="file-complaint-container">
-            <header className="complaint-header">
-                <h1>File New Complaint</h1>
-                <Link to="/dashboard" className="back-to-dashboard-btn">Back to Dashboard</Link>
-            </header>
+    if (loading && isEditMode) { // Show loading only for initial fetch in edit mode
+        return <div className="complaint-page-container">Loading complaint data...</div>;
+    }
 
-            <form className="complaint-form" onSubmit={handleSubmit}>
-                {submitMessage && (
-                    <div className={`message ${submitMessage.includes('success') ? 'success' : 'error'}`}>
-                        {submitMessage}
+    if (fetchError && isEditMode) { // Show error only for initial fetch in edit mode
+        return <div className="complaint-page-container">Error: {fetchError}</div>;
+    }
+
+
+    return (
+        <div className="complaint-page-container">
+            <div className="complaint-form-wrapper">
+                <h2>{isEditMode ? 'Edit Complaint' : 'File a New Complaint'}</h2>
+                {message && (
+                    <div className={`form-message ${message.includes('successful') ? 'success' : 'error'}`}>
+                        {message}
                     </div>
                 )}
-
-                <div className="form-group">
-                    <label htmlFor="title">Complaint Title</label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        placeholder="E.g., Broken chair in Lecture Hall 5"
-                        value={formData.title}
-                        onChange={handleChange}
-                        className={errors.title ? 'input-error' : ''}
-                    />
-                    {errors.title && <span className="error-text">{errors.title}</span>}
-                </div>
-
-                <div className="form-group">
-                    <label>Smart Suggestions</label>
-                    <div className="smart-suggestions">
-                        <button type="button" onClick={() => handleSmartSuggestion('Wi-Fi Connectivity Issue')}>Wi-Fi Connectivity Issue</button>
-                        <button type="button" onClick={() => handleSmartSuggestion('Electrical Problem')}>Electrical Problem</button>
-                        <button type="button" onClick={() => handleSmartSuggestion('Sanitation Complaint')}>Sanitation Complaint</button>
+                <form onSubmit={handleSubmit} className="complaint-form" encType="multipart/form-data">
+                    <div className="form-group">
+                        <label htmlFor="title">Complaint Title</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
-                </div>
 
-                <div className="form-group">
-                    <label htmlFor="department">Department/Building</label>
-                    <select
-                        id="department"
-                        name="department"
-                        value={formData.department}
-                        onChange={handleChange}
-                        className={errors.department ? 'input-error' : ''}
-                    >
-                        <option value="">Select Building/Department</option>
-                        {departments.map(dept => (
-                            <option key={dept._id} value={dept._id}>{dept.name}</option>
-                        ))}
-                    </select>
-                    {errors.department && <span className="error-text">{errors.department}</span>}
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="description">Complaint Details</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        placeholder="Describe your issue in detail..."
-                        value={formData.description}
-                        onChange={handleChange}
-                        maxLength={MAX_DESCRIPTION_LENGTH}
-                        className={errors.description ? 'input-error' : ''}
-                    ></textarea>
-                    <div className="char-count">
-                        {formData.description.length} / {MAX_DESCRIPTION_LENGTH}
+                    <div className="form-group">
+                        <label htmlFor="department">Department</label>
+                        <select
+                            id="department"
+                            name="department"
+                            value={formData.department}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Department</option>
+                            {departments.map(dept => (
+                                <option key={dept._id} value={dept._id}>
+                                    {dept.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                    {errors.description && <span className="error-text">{errors.description}</span>}
-                </div>
 
-                <div className="form-group">
-                    <label>Attachments</label>
-                    <div className="file-upload-area">
-                        <label htmlFor="file-input" className="file-upload-label">
-                            <svg className="upload-icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                            </svg>
-                            Upload images/PDF (max {MAX_FILES} files, {MAX_FILE_SIZE_MB}MB total) *optional*
-                            <input
-                                type="file"
-                                id="file-input"
-                                multiple
-                                accept="image/*,application/pdf"
-                                onChange={handleFileChange}
-                                style={{ display: 'none' }} 
-                            />
-                        </label>
-                        {selectedFiles.length > 0 && (
-                            <div className="selected-files-list">
-                                {selectedFiles.map((file, index) => (
-                                    <div key={index} className="selected-file-item">
-                                        <span>{file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
-                                        <button type="button" onClick={() => handleRemoveFile(index)} className="remove-file-btn">
-                                            &times;
-                                        </button>
-                                    </div>
-                                ))}
+                    <div className="form-group">
+                        <label htmlFor="description">Description</label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            required
+                            rows="5"
+                        ></textarea>
+                    </div>
+
+                    {/* Display status and priority for both create and edit, but you might disable for create or only allow certain values */}
+                    <div className="form-group">
+                        <label htmlFor="status">Status</label>
+                        <select
+                            id="status"
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            // You might want to disable status change for non-admin users
+                            // disabled={!isEditMode && true} // Example: disable if not in edit mode
+                        >
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option> {/* If Closed is an option */}
+                            <option value="Unresolved">Unresolved</option> {/* If Unresolved is an option */}
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="priority">Priority</label>
+                        <select
+                            id="priority"
+                            name="priority"
+                            value={formData.priority}
+                            onChange={handleChange}
+                        >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    {/* Attachment handling */}
+                    <div className="form-group">
+                        <label htmlFor="attachments">Attachments</label>
+                        <input
+                            type="file"
+                            id="attachments"
+                            name="attachments"
+                            multiple
+                            onChange={handleFileChange}
+                        />
+                        {/* Display existing attachments in edit mode */}
+                        {isEditMode && existingAttachments.length > 0 && (
+                            <div className="existing-attachments">
+                                <h4>Existing Attachments:</h4>
+                                <ul>
+                                    {existingAttachments.map((att, index) => (
+                                        <li key={index}>
+                                            <a href={`http://localhost:4000${att.filepath.split('public')[1]}`} target="_blank" rel="noopener noreferrer">
+                                                {att.filename}
+                                            </a>
+                                            {/* Optionally add a button to remove individual attachments,
+                                                but this would require backend support for partial removal. */}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="info-text">Uploading new files will replace existing ones (backend behavior).</p>
                             </div>
                         )}
-                        {errors.files && <span className="error-text">{errors.files}</span>}
+                        {isEditMode && existingAttachments.length === 0 && (
+                            <p className="info-text">No existing attachments. Upload new ones if needed.</p>
+                        )}
                     </div>
-                </div>
 
-                <div className="form-actions">
-                    <button type="button" className="cancel-btn" onClick={() => navigate('/dashboard')}>Cancel</button>
-                    <button type="submit" className="submit-btn">Submit Complaint</button>
-                </div>
-            </form>
-
-            {/* Success Modal */}
-            {showSuccessModal && (
-                <div className="success-modal-overlay">
-                    <div className="success-modal-content">
-                        <svg className="checkmark" viewBox="0 0 52 52">
-                            <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-                            <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                        </svg>
-                        <h3>Complaint #{complaintId} submitted!</h3>
-                        <p>You'll receive updates via email.</p>
-                        <p>Track status in your dashboard.</p>
-                        <button className="primary-btn" onClick={() => { setShowSuccessModal(false); navigate('/dashboard'); }}>
-                            Go to Dashboard
-                        </button>
-                    </div>
-                </div>
-            )}
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update Complaint' : 'File Complaint')}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

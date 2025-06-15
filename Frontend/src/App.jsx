@@ -1,9 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // <-- NEW: Added Navigate
 import Home from './pages/Home';
-import Login from './pages/login';
+import Login from './pages/Login';
 import Register from './pages/Register';
-import UserDashboard from './pages/userDash';
-import ComplaintPage from './pages/complaintPage';
+import UserDashboard from './pages/userDash'; // Note: component name is UserDashboard, file name is userDash.jsx
+import ComplaintPage from './pages/complaintPage'; // Note: component name is ComplaintPage, file name is complaintPage.jsx
+import ViewComplaints from './pages/viewComplaints'; // Note: component name is ViewComplaints, file name is viewComplaints.jsx
 
 const PrivateRoute = ({ children }) => {
     const isAuthenticated = localStorage.getItem('token'); // Check for token
@@ -11,23 +13,27 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
+                {/* Protected Routes */}
+                <Route path="/dashboard" element={<PrivateRoute><UserDashboard /></PrivateRoute>} />
 
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login/>}/> 
-        <Route path="/register" element={<Register/>}/>
+                {/* Route for creating new complaints */}
+                <Route path="/complaintPage" element={<PrivateRoute><ComplaintPage /></PrivateRoute>} />
+                {/* NEW: Route for editing existing complaints (with ID parameter) */}
+                <Route path="/complaintPage/:id" element={<PrivateRoute><ComplaintPage /></PrivateRoute>} />
 
-        <Route path="/dashboard" element={<PrivateRoute> <UserDashboard /> </PrivateRoute>}/>
+                {/* Path for viewing all complaints - ensuring consistency with previous steps */}
+                <Route path="/viewComplaints" element={<PrivateRoute><ViewComplaints /></PrivateRoute>} />
 
-        <Route path="/complaintPage" element={<PrivateRoute><ComplaintPage /></PrivateRoute>}/>
-              
-
-      </Routes>
-    </Router>
-  )
+            </Routes>
+        </Router>
+    )
 }
 
-export default App
+export default App;

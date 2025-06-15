@@ -9,7 +9,7 @@ const QuickActions = () => (
     <div className="dashboard-widget quick-actions">
         <h2>Quick Actions</h2>
         <Link to="/ComplaintPage" className="primary-btn">File New Complaint</Link>
-        <button className="secondary-btn">View All Complaints</button> {/* This could navigate to a dedicated complaints list */}
+        <Link to="/viewComplaints" className="secondary-btn">View All Complaints</Link> 
     </div>
 );
 
@@ -133,7 +133,7 @@ const UserDashboard = () => {
                 <ul className="sidebar-links">
                     <li><Link to="/dashboard">Dashboard</Link></li>
                     <li><Link to="/ComplaintPage">File Complaint</Link></li>
-                    <li><Link to="/complaint-status">Complaint Status</Link></li>
+                    <li><Link to="/viewComplaints">View Complaints</Link></li>
                     <li><Link to="/profile">Profile</Link></li>
                     <li><Link to="/notifications">Notifications</Link></li>
                     <li><Link to="/settings">Settings</Link></li>
