@@ -43,6 +43,7 @@ exports.loginUser = async (req, res) => {
             email: user.email,
             fname: user.first_name,
             lname: user.last_name,
+            username: user.username,
             user_cat: user.userCategory
         };
 
