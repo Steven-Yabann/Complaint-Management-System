@@ -1,32 +1,29 @@
 // frontend/src/pages/UserDashboard.jsx
 
-import React, { useState, useEffect } from 'react'; // Make sure useEffect is imported
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styling/userDash.css';
 
-// We will make these components accept props to be dynamic
 const QuickActions = () => (
     <div className="dashboard-widget quick-actions">
         <h2>Quick Actions</h2>
         <Link to="/ComplaintPage" className="primary-btn">File New Complaint</Link>
-        <Link to="/viewComplaints" className="secondary-btn">View All Complaints</Link> 
+        <Link to="/viewComplaints" className="secondary-btn">View All Complaints</Link>
     </div>
 );
 
-// This component will now receive complaint data as a prop
 const ComplaintSummary = ({ complaints }) => {
-    // Calculate summary based on the actual complaints data
     const total = complaints.length;
     const open = complaints.filter(c => c.status === 'Open').length;
     const inProgress = complaints.filter(c => c.status === 'In Progress').length;
-    const resolved = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length; // Assuming 'Closed' also means resolved
+    const resolved = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
 
     return (
         <div className="dashboard-widget complaint-summary">
             <h2>Complaint Summary</h2>
             <div className="summary-grid">
                 <div className="summary-item total">Total: <span>{total}</span></div>
-                <div className="summary-item pending">Open: <span>{open}</span></div> {/* Changed from Pending to Open to match schema */}
+                <div className="summary-item pending">Open: <span>{open}</span></div>
                 <div className="summary-item in-progress">In Progress: <span>{inProgress}</span></div>
                 <div className="summary-item resolved">Resolved/Closed: <span>{resolved}</span></div>
             </div>
@@ -34,7 +31,6 @@ const ComplaintSummary = ({ complaints }) => {
     );
 };
 
-// You might want to update this to show recent actual complaints or notifications based on complaints
 const RecentComplaintsDisplay = ({ complaints }) => (
     <div className="dashboard-widget recent-complaints">
         <h2>Recent Complaints</h2>
@@ -42,20 +38,18 @@ const RecentComplaintsDisplay = ({ complaints }) => (
             <p>No recent complaints to display.</p>
         ) : (
             <ul>
-                {complaints.slice(0, 5).map(complaint => ( // Show up to 5 most recent complaints
+                {complaints.slice(0, 5).map(complaint => (
                     <li key={complaint._id}>
                         <strong>{complaint.title}</strong> - Status: {complaint.status} ({new Date(complaint.createdAt).toLocaleDateString()})
-                        {/* Optional: Add a link to view full complaint details */}
                     </li>
                 ))}
             </ul>
         )}
         {complaints.length > 5 && (
-            <Link to="/complaint-status" className="view-more-link">View All Complaints</Link>
+            <Link to="/viewComplaints" className="view-more-link">View All Complaints</Link>
         )}
     </div>
 );
-
 
 const UserDashboard = () => {
     const navigate = useNavigate();
@@ -70,18 +64,33 @@ const UserDashboard = () => {
         navigate('/login');
     };
 
-    // Authentication check should probably be higher up or use context/router protection
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const storedUsername = localStorage.getItem('username');
         if (!token) {
             navigate('/login');
             return;
         }
 
-        if(storedUsername){
-            setUsername(storedUsername);
-        }
+        const fetchUserProfile = async () => {
+            try {
+                const response = await fetch('http://localhost:4000/api/users/profile', { // Assuming this endpoint exists on your backend
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsername(data.username);
+                    localStorage.setItem('username', data.username); // Update localStorage with actual username
+                } else {
+                    console.error('Failed to fetch user profile:', await response.json());
+                    setUsername(localStorage.getItem('username') || 'User'); // Fallback
+                }
+            } catch (err) {
+                console.error('Network error fetching user profile:', err);
+                setUsername(localStorage.getItem('username') || 'User'); // Fallback
+            }
+        };
 
         const fetchUserComplaints = async () => {
             try {
@@ -107,9 +116,9 @@ const UserDashboard = () => {
             }
         };
 
+        fetchUserProfile();
         fetchUserComplaints();
-    }, [navigate]); // Re-run if navigate changes (though unlikely, it's good practice for hooks)
-
+    }, [navigate]);
 
     if (loading) {
         return <div className="user-dashboard-container">Loading dashboard...</div>;
@@ -121,7 +130,6 @@ const UserDashboard = () => {
 
     return (
         <div className="user-dashboard-container">
-            {/* Sidebar */}
             <nav className="dashboard-sidebar">
                 <div className="sidebar-header">
                     <div className="sidebar-profile">
@@ -134,23 +142,22 @@ const UserDashboard = () => {
                     <li><Link to="/dashboard">Dashboard</Link></li>
                     <li><Link to="/ComplaintPage">File Complaint</Link></li>
                     <li><Link to="/viewComplaints">View Complaints</Link></li>
-                    <li><Link to="/profile">Profile</Link></li>
+                    <li><Link to="/profile">Profile</Link></li> {/* Link to the new Profile page */}
                     <li><Link to="/notifications">Notifications</Link></li>
-                    <li><Link to="/settings">Settings</Link></li>
+                    {/* REMOVED: <li><Link to="/settings">Settings</Link></li> */}
                     <li><button onClick={handleLogout} className="logout-btn">Logout</button></li>
                 </ul>
             </nav>
 
-            {/* Main Content */}
             <main className="dashboard-main-content">
                 <header className="main-content-header">
-                    <h1>Welcome, {username}</h1> 
+                    <h1>Welcome, {username}</h1>
                 </header>
 
                 <section className="dashboard-widgets-grid">
                     <QuickActions />
-                    <ComplaintSummary complaints={userComplaints} /> {/* Pass complaints as prop */}
-                    <RecentComplaintsDisplay complaints={userComplaints} /> {/* Pass complaints as prop */}
+                    <ComplaintSummary complaints={userComplaints} />
+                    <RecentComplaintsDisplay complaints={userComplaints} />
                 </section>
             </main>
         </div>

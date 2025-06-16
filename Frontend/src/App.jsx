@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import UserDashboard from './pages/userDash'; // Note: component name is UserDashboard, file name is userDash.jsx
 import ComplaintPage from './pages/complaintPage'; // Note: component name is ComplaintPage, file name is complaintPage.jsx
 import ViewComplaints from './pages/viewComplaints'; // Note: component name is ViewComplaints, file name is viewComplaints.jsx
+import ProfilePage from './pages/ProfilePage'; // NEW: Importing ProfilePage component
 
 const PrivateRoute = ({ children }) => {
     const isAuthenticated = localStorage.getItem('token'); // Check for token
@@ -30,6 +31,8 @@ function App() {
 
                 {/* Path for viewing all complaints - ensuring consistency with previous steps */}
                 <Route path="/viewComplaints" element={<PrivateRoute><ViewComplaints /></PrivateRoute>} />
+                {/* NEW: Route for user profile page */}
+                <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
 
             </Routes>
         </Router>

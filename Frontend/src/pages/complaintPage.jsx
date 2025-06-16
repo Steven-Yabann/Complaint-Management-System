@@ -1,8 +1,6 @@
-// frontend/src/pages/ComplaintPage.jsx
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
+import { useNavigate, useParams, Link } from 'react-router-dom'; // <-- Make sure Link is imported
+import { jwtDecode } from 'jwt-decode';
 import '../styling/complaintPage.css';
 
 const ComplaintPage = () => {
@@ -25,7 +23,7 @@ const ComplaintPage = () => {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState(null);
-    const [userRole, setUserRole] = useState(null); // Still null initially
+    const [userRole, setUserRole] = useState(null);
 
     // --- Fetch User Role on Component Mount by decoding JWT ---
     useEffect(() => {
@@ -36,32 +34,23 @@ const ComplaintPage = () => {
         }
 
         try {
-            // Decode the token to get user information, including the role
             const decodedToken = jwtDecode(token);
-            setUserRole(decodedToken.role); // Assuming your JWT payload has a 'role' field
+            setUserRole(decodedToken.role);
 
-            // Optional: Check token expiry
-            const currentTime = Date.now() / 1000; // in seconds
+            const currentTime = Date.now() / 1000;
             if (decodedToken.exp < currentTime) {
-                // Token expired, handle logout or refresh
                 console.warn("Token expired. Please log in again.");
                 localStorage.removeItem('token');
-                localStorage.removeItem('userRole'); // Clear any stored role too
+                localStorage.removeItem('userRole');
                 navigate('/login');
             }
 
         } catch (e) {
             console.error("Error decoding token or token is invalid:", e);
-            // If token is invalid or decoding fails, assume 'user' role or log out
-            setUserRole('user'); // Default to a non-admin role if token is problematic
-            // Optionally, force logout if token is truly invalid
-            // localStorage.removeItem('token');
-            // localStorage.removeItem('userRole');
-            // navigate('/login');
+            setUserRole('user');
         }
-    }, [navigate]); // Depend on navigate
+    }, [navigate]);
 
-    // --- Rest of your useEffects and functions remain the same ---
     // --- Fetch Departments on Component Mount ---
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -167,14 +156,11 @@ const ComplaintPage = () => {
         complaintData.append('department', formData.department);
         complaintData.append('description', formData.description);
 
-        // --- Modified Status Logic based on role ---
-        if (isEditMode && userRole === 'admin') { // Only admins can change status when editing
+        if (isEditMode && userRole === 'admin') {
             complaintData.append('status', formData.status);
         } else {
-            // For new complaints, or for users editing, status is always 'Open'
-            complaintData.append('status', 'Open');
+            complaintData.append('status', 'Open'); // For new complaints or user editing (status is static)
         }
-        // --- End Modified Status Logic ---
 
         complaintData.append('priority', formData.priority);
 
@@ -216,7 +202,7 @@ const ComplaintPage = () => {
                     setExistingAttachments([]);
                 }
                 setTimeout(() => {
-                    navigate('/viewComplaints');
+                    navigate('/viewComplaints'); // Redirect to view complaints after success
                 }, 1500);
             } else {
                 setMessage(data.message || `Failed to ${isEditMode ? 'update' : 'file'} complaint.`);
@@ -230,6 +216,7 @@ const ComplaintPage = () => {
         }
     };
 
+    // --- Loading and Error States for Initial Data Fetch ---
     if (loading && isEditMode) {
         return <div className="complaint-page-container">Loading complaint data...</div>;
     }
@@ -243,9 +230,16 @@ const ComplaintPage = () => {
         return <div className="complaint-page-container">Loading user role...</div>;
     }
 
-
+    // --- Main Component Render ---
     return (
         <div className="complaint-page-container">
+            {/* Added "Go Back" button and "Go to Dashboard" link */}
+            <div className="navigation-buttons-top">
+
+                {/* Option 2: Using Link for specific navigation to dashboard */}
+                <Link to="/dashboard" className="btn btn-primary dashboard-link">Go to Dashboard</Link>
+            </div>
+            
             <div className="complaint-form-wrapper">
                 <h2>{isEditMode ? 'Edit Complaint' : 'File a New Complaint'}</h2>
                 {message && (
@@ -296,7 +290,6 @@ const ComplaintPage = () => {
                         ></textarea>
                     </div>
 
-                    {/* Only show Status dropdown if in edit mode AND user is an admin */}
                     {isEditMode && userRole === 'admin' && (
                         <div className="form-group">
                             <label htmlFor="status">Status</label>
@@ -314,21 +307,18 @@ const ComplaintPage = () => {
                             </select>
                         </div>
                     )}
-                    {/* Display status as plain text if in edit mode but not admin */}
                     {isEditMode && userRole !== 'admin' && (
                         <div className="form-group">
                             <label>Status</label>
                             <p className="form-static-value">{formData.status}</p>
                         </div>
                     )}
-                    {/* For new complaints, status is always "Open", no need to show anything */}
                     {!isEditMode && (
                         <div className="form-group">
                             <label>Status</label>
                             <p className="form-static-value">Open (Default)</p>
                         </div>
                     )}
-
 
                     <div className="form-group">
                         <label htmlFor="priority">Priority</label>
@@ -345,7 +335,6 @@ const ComplaintPage = () => {
                         </select>
                     </div>
 
-                    {/* Attachment handling */}
                     <div className="form-group">
                         <label htmlFor="attachments">Attachments</label>
                         <input
@@ -355,7 +344,6 @@ const ComplaintPage = () => {
                             multiple
                             onChange={handleFileChange}
                         />
-                        {/* Display existing attachments in edit mode */}
                         {isEditMode && existingAttachments.length > 0 && (
                             <div className="existing-attachments">
                                 <h4>Existing Attachments:</h4>
