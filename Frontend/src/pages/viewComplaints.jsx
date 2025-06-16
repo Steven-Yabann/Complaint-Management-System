@@ -1,13 +1,13 @@
 // frontend/src/pages/viewComplaints.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Ensure Link is imported
 import '../styling/viewComplaints.css'; // Make sure this path is correct
 
 const ViewComplaints = () => {
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(null); // Corrected: was `useState = useState(null)`
     const navigate = useNavigate();
 
     // Function to fetch complaints - now reusable after delete/edit
@@ -62,20 +62,22 @@ const ViewComplaints = () => {
         }
     };
 
-    // --- NEW: handleEdit function ---
     const handleEdit = (complaintId) => {
         // Navigate to the ComplaintPage with the complaint ID as a URL parameter
+        console.log(`Navigating to edit complaint: /ComplaintPage/${complaintId}`); // Added for debugging
         navigate(`/ComplaintPage/${complaintId}`);
     };
 
-    // --- NEW: handleDelete function ---
     const handleDelete = async (complaintId) => {
+        console.log(`Attempting to delete complaint: ${complaintId}`); // Added for debugging
         if (!window.confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) {
+            console.log('Delete cancelled by user.'); // Added for debugging
             return; // User cancelled
         }
 
         const token = localStorage.getItem('token');
         if (!token) {
+            console.warn('No token found, redirecting to login.'); // Added for debugging
             navigate('/login');
             return;
         }
@@ -93,16 +95,16 @@ const ViewComplaints = () => {
                 console.log('Complaint deleted successfully!');
                 // Remove the deleted complaint from the state to update the UI
                 setComplaints(prevComplaints => prevComplaints.filter(comp => comp._id !== complaintId));
-                // Optionally, refetch complaints to ensure data consistency
+                // Optionally, refetch complaints to ensure data consistency if backend doesn't return updated list
                 // fetchComplaints();
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Failed to delete complaint.');
-                console.error('Failed to delete complaint:', errorData);
+                console.error('Failed to delete complaint:', errorData); // Log detailed error from backend
             }
         } catch (err) {
             setError('Network error: Could not connect to the server.');
-            console.error('Network error deleting complaint:', err);
+            console.error('Network Error during delete:', err); // Log network error
         } finally {
             setLoading(false); // Hide loading state
         }
@@ -119,6 +121,9 @@ const ViewComplaints = () => {
 
     return (
         <div className="complaint-status-container">
+            <div className="dashboard-link-container">
+                <Link to="/dashboard" className="btn btn-primary dashboard-link">Go to Dashboard</Link>
+            </div>
             <h1>My Complaints</h1>
             {complaints.length === 0 ? (
                 <p>You haven't filed any complaints yet. <Link to="/ComplaintPage">File a new one</Link>.</p>
@@ -148,7 +153,6 @@ const ViewComplaints = () => {
                                     </td>
                                     <td>{new Date(complaint.createdAt).toLocaleDateString()}</td>
                                     <td className="actions-cell">
-                                        {/* NEW: Add onClick handlers */}
                                         <button
                                             className="action-btn edit-btn"
                                             onClick={() => handleEdit(complaint._id)}

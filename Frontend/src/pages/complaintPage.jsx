@@ -1,31 +1,67 @@
 // frontend/src/pages/ComplaintPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom'; // NEW: Import useParams
-import '../styling/complaintPage.css'; // Assuming you have this CSS file
+import { useNavigate, useParams } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
+import '../styling/complaintPage.css';
 
 const ComplaintPage = () => {
-    const { id } = useParams(); // Get ID from URL for edit mode
+    const { id } = useParams();
     const navigate = useNavigate();
 
-    // Determine if we are in edit mode
-    const isEditMode = !!id; // True if ID exists, false otherwise
+    const isEditMode = !!id;
 
     const [formData, setFormData] = useState({
         title: '',
         department: '',
         description: '',
-        status: 'Open', // Default status for new complaints
-        priority: 'Medium', // Default priority for new complaints
-        attachments: null // For file input
+        status: 'Open',
+        priority: 'Medium',
+        attachments: null
     });
 
-    const [existingAttachments, setExistingAttachments] = useState([]); // To display/manage existing files during edit
+    const [existingAttachments, setExistingAttachments] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [fetchError, setFetchError] = useState(null); // For fetching initial complaint data in edit mode
+    const [fetchError, setFetchError] = useState(null);
+    const [userRole, setUserRole] = useState(null); // Still null initially
 
+    // --- Fetch User Role on Component Mount by decoding JWT ---
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        try {
+            // Decode the token to get user information, including the role
+            const decodedToken = jwtDecode(token);
+            setUserRole(decodedToken.role); // Assuming your JWT payload has a 'role' field
+
+            // Optional: Check token expiry
+            const currentTime = Date.now() / 1000; // in seconds
+            if (decodedToken.exp < currentTime) {
+                // Token expired, handle logout or refresh
+                console.warn("Token expired. Please log in again.");
+                localStorage.removeItem('token');
+                localStorage.removeItem('userRole'); // Clear any stored role too
+                navigate('/login');
+            }
+
+        } catch (e) {
+            console.error("Error decoding token or token is invalid:", e);
+            // If token is invalid or decoding fails, assume 'user' role or log out
+            setUserRole('user'); // Default to a non-admin role if token is problematic
+            // Optionally, force logout if token is truly invalid
+            // localStorage.removeItem('token');
+            // localStorage.removeItem('userRole');
+            // navigate('/login');
+        }
+    }, [navigate]); // Depend on navigate
+
+    // --- Rest of your useEffects and functions remain the same ---
     // --- Fetch Departments on Component Mount ---
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -35,7 +71,7 @@ const ComplaintPage = () => {
                 return;
             }
             try {
-                const response = await fetch('http://localhost:4000/api/departments', { // Assuming this endpoint exists
+                const response = await fetch('http://localhost:4000/api/departments', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -75,13 +111,13 @@ const ComplaintPage = () => {
 
                         setFormData({
                             title: complaint.title || '',
-                            department: complaint.department ? complaint.department._id : '', // Use _id for select
+                            department: complaint.department ? complaint.department._id : '',
                             description: complaint.description || '',
                             status: complaint.status || 'Open',
                             priority: complaint.priority || 'Medium',
-                            attachments: null // attachments input is cleared for new uploads
+                            attachments: null
                         });
-                        setExistingAttachments(complaint.attachments || []); // Store existing attachments to display
+                        setExistingAttachments(complaint.attachments || []);
                     } else {
                         const errorData = await response.json();
                         setFetchError(errorData.message || 'Failed to load complaint for editing.');
@@ -96,7 +132,7 @@ const ComplaintPage = () => {
             };
             fetchComplaintData();
         }
-    }, [id, isEditMode, navigate]); // Depend on ID and edit mode
+    }, [id, isEditMode, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -109,7 +145,7 @@ const ComplaintPage = () => {
     const handleFileChange = (e) => {
         setFormData({
             ...formData,
-            attachments: e.target.files // FileList object
+            attachments: e.target.files
         });
     };
 
@@ -126,29 +162,31 @@ const ComplaintPage = () => {
             return;
         }
 
-        // Create FormData object for mixed data (text + files)
         const complaintData = new FormData();
         complaintData.append('title', formData.title);
         complaintData.append('department', formData.department);
         complaintData.append('description', formData.description);
-        complaintData.append('status', formData.status);
+
+        // --- Modified Status Logic based on role ---
+        if (isEditMode && userRole === 'admin') { // Only admins can change status when editing
+            complaintData.append('status', formData.status);
+        } else {
+            // For new complaints, or for users editing, status is always 'Open'
+            complaintData.append('status', 'Open');
+        }
+        // --- End Modified Status Logic ---
+
         complaintData.append('priority', formData.priority);
 
-        // Append new attachments if selected
         if (formData.attachments) {
             for (let i = 0; i < formData.attachments.length; i++) {
                 complaintData.append('attachments', formData.attachments[i]);
             }
         }
-        // IMPORTANT: If you want to keep existing attachments AND add new ones,
-        // your backend must support that by appending to the array, not replacing.
-        // As per our current backend logic for PUT, if 'attachments' field is sent, it replaces.
-        // So, if no new files are selected, we simply don't append 'attachments' field,
-        // and the backend will keep the existing ones.
 
         const url = isEditMode
-            ? `http://localhost:4000/api/complaints/${id}` // PUT for update
-            : 'http://localhost:4000/api/complaints'; // POST for new
+            ? `http://localhost:4000/api/complaints/${id}`
+            : 'http://localhost:4000/api/complaints';
 
         const method = isEditMode ? 'PUT' : 'POST';
 
@@ -157,8 +195,6 @@ const ComplaintPage = () => {
                 method: method,
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    // IMPORTANT: Do NOT set 'Content-Type': 'multipart/form-data' here.
-                    // The browser sets it automatically with the correct boundary when you use FormData.
                 },
                 body: complaintData,
             });
@@ -168,7 +204,6 @@ const ComplaintPage = () => {
             if (response.ok) {
                 setMessage(data.message || (isEditMode ? 'Complaint updated successfully!' : 'Complaint filed successfully!'));
                 setLoading(false);
-                // Optionally clear form for new complaint after submission
                 if (!isEditMode) {
                     setFormData({
                         title: '',
@@ -178,9 +213,8 @@ const ComplaintPage = () => {
                         priority: 'Medium',
                         attachments: null
                     });
-                    setExistingAttachments([]); // Clear existing attachments display
+                    setExistingAttachments([]);
                 }
-                // Redirect to dashboard or complaint status page after a short delay
                 setTimeout(() => {
                     navigate('/viewComplaints');
                 }, 1500);
@@ -196,12 +230,17 @@ const ComplaintPage = () => {
         }
     };
 
-    if (loading && isEditMode) { // Show loading only for initial fetch in edit mode
+    if (loading && isEditMode) {
         return <div className="complaint-page-container">Loading complaint data...</div>;
     }
 
-    if (fetchError && isEditMode) { // Show error only for initial fetch in edit mode
+    if (fetchError && isEditMode) {
         return <div className="complaint-page-container">Error: {fetchError}</div>;
+    }
+
+    // Crucial: Only render the form once userRole is determined
+    if (userRole === null) {
+        return <div className="complaint-page-container">Loading user role...</div>;
     }
 
 
@@ -257,24 +296,39 @@ const ComplaintPage = () => {
                         ></textarea>
                     </div>
 
-                    {/* Display status and priority for both create and edit, but you might disable for create or only allow certain values */}
-                    <div className="form-group">
-                        <label htmlFor="status">Status</label>
-                        <select
-                            id="status"
-                            name="status"
-                            value={formData.status}
-                            onChange={handleChange}
-                            // You might want to disable status change for non-admin users
-                            // disabled={!isEditMode && true} // Example: disable if not in edit mode
-                        >
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Resolved">Resolved</option>
-                            <option value="Closed">Closed</option> {/* If Closed is an option */}
-                            <option value="Unresolved">Unresolved</option> {/* If Unresolved is an option */}
-                        </select>
-                    </div>
+                    {/* Only show Status dropdown if in edit mode AND user is an admin */}
+                    {isEditMode && userRole === 'admin' && (
+                        <div className="form-group">
+                            <label htmlFor="status">Status</label>
+                            <select
+                                id="status"
+                                name="status"
+                                value={formData.status}
+                                onChange={handleChange}
+                            >
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Closed">Closed</option>
+                                <option value="Unresolved">Unresolved</option>
+                            </select>
+                        </div>
+                    )}
+                    {/* Display status as plain text if in edit mode but not admin */}
+                    {isEditMode && userRole !== 'admin' && (
+                        <div className="form-group">
+                            <label>Status</label>
+                            <p className="form-static-value">{formData.status}</p>
+                        </div>
+                    )}
+                    {/* For new complaints, status is always "Open", no need to show anything */}
+                    {!isEditMode && (
+                        <div className="form-group">
+                            <label>Status</label>
+                            <p className="form-static-value">Open (Default)</p>
+                        </div>
+                    )}
+
 
                     <div className="form-group">
                         <label htmlFor="priority">Priority</label>
@@ -311,8 +365,6 @@ const ComplaintPage = () => {
                                             <a href={`http://localhost:4000${att.filepath.split('public')[1]}`} target="_blank" rel="noopener noreferrer">
                                                 {att.filename}
                                             </a>
-                                            {/* Optionally add a button to remove individual attachments,
-                                                but this would require backend support for partial removal. */}
                                         </li>
                                     ))}
                                 </ul>
