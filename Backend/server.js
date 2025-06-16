@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/error');
 const departmentRoutes = require('./Routes/departmentRoutes');
 const complaintRoutes = require('./Routes/complaint_router');
 
+const userRoutes = require('./Routes/userRoutes'); // Import user routes if needed
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -27,6 +28,7 @@ app.use('/api', authRoutes); // All auth routes will be prefixed with /api
 app.use('/api/departments', departmentRoutes); // All department routes will be prefixed with /api
 app.use('/api/complaints',complaintRoutes);
 
+app.use('/api/users', userRoutes); // All user routes will be prefixed with /api
 
 // Simple test route
 app.get('/', (req, res) => {
