@@ -2,11 +2,13 @@
 
 const Complaint = require('../models/Complaint');
 const Department = require('../models/department');
+const User = require('../models/User'); // NEW: Make sure this line is present and correctly imports your User model.
 const multer = require('multer');
 const path = require('path');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const fs = require('fs'); // Import file system module for deleting files
+const sendEmail = require('../utils/emailService'); // NEW: Make sure this line is present and imports your email service.
 
 
 // --- Multer Configuration for File Uploads ---
@@ -78,9 +80,7 @@ exports.createComplaint = asyncHandler(async (req, res, next) => {
 
         const attachments = req.files ? req.files.map(file => ({
             filename: file.originalname,
-            // Multer's file.path usually gives an absolute path.
-            // We store it directly for deletion later.
-            filepath: file.path, // This is the absolute path to the uploaded file
+            filepath: file.path,
             mimetype: file.mimetype
         })) : [];
 
@@ -89,14 +89,50 @@ exports.createComplaint = asyncHandler(async (req, res, next) => {
             title,
             department,
             description,
-            status,
-            priority,
+            status: status || 'Open', // Defaults to 'Open' if not provided
+            priority: priority || 'Low', // Defaults to 'Low' if not provided
             attachments
         });
 
+        // --- NEW CODE STARTS HERE ---
+        try {
+            // Assuming req.user is populated by your 'protect' middleware
+            // and contains `email` and `username` from the User model.
+            const userEmail = req.user.email;
+            const userName = req.user.username;
+
+            if (userEmail && userName) {
+                const mailOptions = {
+                    to: userEmail,
+                    subject: `Complaint #${complaint._id.toString().substring(0, 8)} Submitted Successfully!`,
+                    html: `
+                        <p>Hello ${userName},</p>
+                        <p>Your complaint has been successfully submitted to our team.</p>
+                        <p><strong>Complaint Title:</strong> ${complaint.title}</p>
+                        <p><strong>Description:</strong> ${complaint.description}</p>
+                        <p><strong>Complaint ID:</strong> ${complaint._id}</p>
+                        <p><strong>Status:</strong> ${complaint.status}</p>
+                        <p>We've received your complaint and will have our team look into it as soon as possible. You can track its progress and view updates by visiting your dashboard.</p>
+                        <p>Thank you for your patience and for bringing this to our attention.</p>
+                        <p>Best regards,</p>
+                        <p>Your Complaint Management Team</p>
+                    `,
+                };
+                await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
+                console.log(`Complaint submission email sent to ${userEmail} for complaint ID: ${complaint._id}`);
+            } else {
+                console.warn(`User email or username not found in req.user for complaint notification (User ID: ${req.user.id}). Email not sent.`);
+            }
+        } catch (emailError) {
+            console.error('Error sending complaint submission email:', emailError);
+            // It's crucial not to return an error here. The complaint was successfully created.
+            // Just log the email failure.
+        }
+        // --- NEW CODE ENDS HERE ---
+
         res.status(201).json({
             success: true,
-            message: 'Complaint submitted successfully!',
+            message: 'Complaint submitted successfully! A confirmation email has been sent.', // Updated message for frontend
             data: complaint,
             complaintId: complaint._id
         });
@@ -187,25 +223,7 @@ exports.updateComplaint = asyncHandler(async (req, res, next) => {
 
         // If there are new attachments, add them to the existing ones
         if (newAttachments.length > 0) {
-            // This assumes frontend will re-send existing attachments if they want to keep them.
-            // Or, you can explicitly manage removal by sending attachment IDs to delete from frontend.
-            // For now, we are replacing the attachments array if new ones are provided.
-            // If you want to APPEND, you would do: updateFields.attachments = [...complaint.attachments, ...newAttachments];
-            // But this requires more complex UI to manage existing attachments.
-            // For simplicity, for now, we'll replace the attachments if new ones are uploaded.
-            // If the user wants to keep old and add new, the frontend needs to resend the old ones.
-            // A more robust solution would involve separate routes for adding/removing attachments.
-
-            // Let's go with a simple model: If files are provided in an update, replace all current attachments.
-            // Otherwise, keep existing attachments. This implies the UI handles existing attachments.
-            // If you want to ONLY add new, then 'attachments' should be optional on update.
-            // For now, if req.files exists, it assumes replacement or appending.
-            // Simplest for now: if files are passed, update the 'attachments' field.
-            // If no files are passed, the 'attachments' field is not updated, retaining old ones.
             updateFields.attachments = newAttachments;
-            // TODO: If you replace, you should also delete the old files from storage!
-            // This requires storing old attachment filepaths and deleting them here.
-            // For initial implementation, we'll leave old files on disk for simplicity.
         }
 
         // It's generally better to use findOneAndUpdate directly to return the updated doc
