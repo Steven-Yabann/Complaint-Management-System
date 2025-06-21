@@ -1,13 +1,13 @@
 require('dotenv').config({ path: './config.env' }); 
 const express = require('express');
 const connectDB = require('./DB/conn'); 
-const authRoutes = require('./Routes/auth_router'); 
+const authRoutes = require('./Routes/authRoutes'); 
 const cors = require('cors'); 
 const path =require('path');
 
 const errorHandler = require('./middleware/error');
 const departmentRoutes = require('./Routes/departmentRoutes');
-const complaintRoutes = require('./Routes/complaint_router');
+const complaintRoutes = require('./Routes/complaintRoutes');
 
 const userRoutes = require('./Routes/userRoutes'); // Import user routes if needed
 const app = express();
