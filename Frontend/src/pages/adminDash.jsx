@@ -233,6 +233,8 @@ const AdminDashboard = () => {
             return;
         }
 
+        
+
         const fetchAdminProfile = async () => {
             try {
                 const response = await fetch('http://localhost:4000/api/admin/profile', {

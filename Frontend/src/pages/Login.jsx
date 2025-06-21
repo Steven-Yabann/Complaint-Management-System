@@ -1,10 +1,10 @@
-// frontend/src/pages/LoginPage.jsx
+// Frontend/src/pages/Login.jsx
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import '../styling/login.css';
 import loginImg from '../assets/login.avif';
-import { jwtDecode } from 'jwt-decode'; // <-- NEW: Import jwtDecode
+import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -70,32 +70,41 @@ const LoginPage = () => {
                 });
 
                 const data = await response.json();
-                console.log('Login API Raw Response Data:', data); // Keep this for now for debugging
 
                 if (response.ok) {
                     setLoginMessage(data.message || 'Login successful! Redirecting...');
                     localStorage.setItem('token', data.token);
 
-                    // --- NEW LOGIC: Decode token to get username ---
+                    // Decode token to get username and role
                     try {
                         const decodedToken = jwtDecode(data.token);
-                        console.log('Decoded Token:', decodedToken); // Log decoded token to verify structure
-                        if (decodedToken && decodedToken.user && decodedToken.user.username) {
-                            localStorage.setItem('username', decodedToken.user.username);
-                        } else {
-                            // Fallback if username isn't in the expected place in the token
-                            console.warn("Username not found in decoded token payload. Using 'User' as default.");
-                            localStorage.setItem('username', 'User');
-                        }
+                        
+                        // Extract user info from token
+                        const userInfo = decodedToken.user || decodedToken;
+                        const username = userInfo.username || 'User';
+                        const userRole = userInfo.role || 'user';
+                        
+                        // Store user info in localStorage
+                        localStorage.setItem('username', username);
+                        localStorage.setItem('userRole', userRole);
+                        
+                        // Redirect based on role
+                        setTimeout(() => {
+                            if (userRole === 'admin') {
+                                navigate('/admin/dashboard');
+                            } else {
+                                navigate('/dashboard');
+                            }
+                        }, 1500);
+
                     } catch (decodeError) {
                         console.error('Error decoding JWT token:', decodeError);
-                        localStorage.setItem('username', 'User'); // Set a fallback username
+                        localStorage.setItem('username', 'User');
+                        localStorage.setItem('userRole', 'user');
+                        setTimeout(() => {
+                            navigate('/dashboard');
+                        }, 1500);
                     }
-                    // --- END NEW LOGIC ---
-
-                    setTimeout(() => {
-                        navigate('/dashboard');
-                    }, 1500);
 
                 } else {
                     setLoginMessage(data.message || 'Login failed. Please check your credentials.');

@@ -20,8 +20,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-
-                {/* Protected Routes */}
+                
                 <Route path="/dashboard" element={<PrivateRoute><UserDashboard /></PrivateRoute>} />
 
                 {/* Route for creating new complaints */}

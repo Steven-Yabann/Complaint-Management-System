@@ -66,10 +66,13 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const user = localStorage.getItem('userData');
         if (!token) {
             navigate('/login');
             return;
         }
+
+        console.log('User:', user);
 
         const fetchUserProfile = async () => {
             try {
