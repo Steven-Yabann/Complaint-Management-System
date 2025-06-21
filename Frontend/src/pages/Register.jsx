@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import '../styling/login.css'; // Assuming your CSS is here
-import registerImg from '../assets/register.avif'; // Assuming your image is here
+import '../styling/login.css';
+import registerImg from '../assets/register.avif'; 
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -87,7 +87,6 @@ const RegisterPage = () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        // --- IMPORTANT CHANGE: Send new fields ---
                         username: formData.username,
                         email: formData.email,
                         password: formData.password

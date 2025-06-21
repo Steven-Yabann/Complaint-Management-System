@@ -24,11 +24,11 @@ app.use(express.static(path.join(__dirname, 'public'))); //This tells Express to
 
 
 // Define Routes
-app.use('/api', authRoutes); // All auth routes will be prefixed with /api
-app.use('/api/departments', departmentRoutes); // All department routes will be prefixed with /api
+app.use('/api', authRoutes); 
+app.use('/api/departments', departmentRoutes); 
 app.use('/api/complaints',complaintRoutes);
 
-app.use('/api/users', userRoutes); // All user routes will be prefixed with /api
+app.use('/api/users', userRoutes);
 
 // Simple test route
 app.get('/', (req, res) => {
