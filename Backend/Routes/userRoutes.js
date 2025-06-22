@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth'); // Make sure this path is correct for your project
+const { protect, authorize } = require('../middleware/auth'); // Make sure this path is correct for your project
 const User = require('../models/User');         // Make sure this path is correct for your project
 const sendEmail = require('../utils/emailService'); // Make sure this path is correct for your project
 const bcrypt = require('bcryptjs'); // Needed for password hashing if you decide to hash here directly again (but model pre-save is better)
@@ -148,24 +148,5 @@ router.post('/reset-password-with-otp', protect, async (req, res) => {
 });
 
 
-// @desc    Get admin profile
-// @route   GET /api/admin/profile
-// @access  Private (Admin)
-router.get('/admin/profile', protect, authorize('admin'), async (req, res) => {
-    try {
-        if (req.user) {
-            res.json({
-                username: req.user.username,
-                email: req.user.email,
-                role: req.user.role
-            });
-        } else {
-            res.status(404).json({ message: 'Admin not found.' });
-        }
-    } catch (error) {
-        console.error("Error fetching admin profile:", error);
-        res.status(500).json({ message: 'Server error fetching profile data.' });
-    }
-});
 
 module.exports = router;

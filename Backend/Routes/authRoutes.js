@@ -65,41 +65,39 @@ router.post('/login', async (req, res) => {
 
     try {
         // Find user by username or email
-        // Note: For email, ensure it's converted to lowercase if your model stores it that way
         let user = await User.findOne({
             $or: [
                 { username: username },
-                { email: username.toLowerCase() } // Ensure email check is case-insensitive if needed
+                { email: username.toLowerCase() } 
             ]
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid Credentials.' });
+            return res.status(400).json({ message: 'Invalid Username.' });
         }
 
         // Compare provided password with hashed password in DB
-        // user.matchPassword() (from your User model) is preferred for clarity and consistency
         const isMatch = await user.matchPassword(password); // Use the method from your User model
 
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid Credentials.' });
+            return res.status(400).json({ message: 'Invalid Password.' });
         }
 
         // User is authenticated, create and return a JWT
         const payload = {
             user: {
-                id: user.id, // Mongoose creates an .id getter for _id
+                id: user.id,
                 username: user.username,
-                email: user.email, // Include email in payload if needed by frontend
-                role: user.role // Include role if you need it for authorization checks on frontend
+                email: user.email, 
+                role: user.role 
             }
         };
 
         // Sign the token
         jwt.sign(
             payload,
-            JWT_SECRET, // Your secret key
-            { expiresIn: '1h' }, // Token expires in 1 hour (adjust as needed)
+            JWT_SECRET,
+            { expiresIn: '1h' },
             (err, token) => {
                 if (err) throw err;
                 // Send token AND other user data needed by the frontend (like username)
@@ -108,7 +106,7 @@ router.post('/login', async (req, res) => {
                     token,
                     username: user.username,
                     email: user.email,
-                    role: user.role // Send role if needed by frontend
+                    role: user.role 
                 });
             }
         );

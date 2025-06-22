@@ -30,6 +30,7 @@ const LoginPage = () => {
         });
     };
 
+
     const validateLogin = () => {
         let valid = true;
         const newErrors = {
@@ -55,7 +56,7 @@ const LoginPage = () => {
         e.preventDefault();
         setLoginMessage('');
         const isValid = validateLogin();
-
+        // console.log("formData", formData);
         if (isValid) {
             try {
                 const response = await fetch('http://localhost:4000/api/login', {
@@ -72,7 +73,7 @@ const LoginPage = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    setLoginMessage(data.message || 'Login successful! Redirecting...');
+                    setLoginMessage(data.message);
                     localStorage.setItem('token', data.token);
 
                     // Decode token to get username and role

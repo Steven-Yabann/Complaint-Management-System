@@ -2,13 +2,13 @@
 require('dotenv').config({ path: './config.env' }); 
 const express = require('express');
 const connectDB = require('./DB/conn'); 
-const authRoutes = require('./Routes/auth_router'); 
+const authRoutes = require('./Routes/authRoutes'); 
 const cors = require('cors'); 
 const path = require('path');
 
 const errorHandler = require('./middleware/error');
 const departmentRoutes = require('./Routes/departmentRoutes');
-const complaintRoutes = require('./Routes/complaint_router');
+const complaintRoutes = require('./Routes/complaintRoutes');
 const userRoutes = require('./Routes/userRoutes');
 const adminRoutes = require('./Routes/adminRoutes'); // Add admin routes
 
@@ -28,7 +28,7 @@ app.use('/api', authRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes); // Add admin routes
+app.use('/api/admin', adminRoutes); 
 
 // Simple test route
 app.get('/', (req, res) => {

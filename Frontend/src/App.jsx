@@ -8,8 +8,8 @@ import UserDashboard from './pages/userDash';
 import ComplaintPage from './pages/complaintPage';
 import ViewComplaints from './pages/viewComplaints';
 import ProfilePage from './pages/ProfilePage';
-import AdminDashboard from './pages/AdminDashboard'; // Import the admin dashboard
-import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/adminDash';
+import ProtectedRoute from './components/protectedRoutes';
 
 function App() {
     return (
