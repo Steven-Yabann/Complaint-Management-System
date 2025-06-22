@@ -30,6 +30,7 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes); 
 
+
 // Simple test route
 app.get('/', (req, res) => {
     res.send('API is running...');
