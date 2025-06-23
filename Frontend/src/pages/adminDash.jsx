@@ -5,6 +5,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styling/adminDash.css';
 
 const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
+    const navigate = useNavigate();
+
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'open': return 'status-open';
@@ -36,6 +38,10 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
         }
     };
 
+    const handleViewComplaint = (complaintId) => {
+        navigate(`/complaint/${complaintId}`);
+    };
+
     return (
         <div className="complaints-table-container">
             <div className="complaints-header">
@@ -63,7 +69,7 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                                 </span>
                             </div>
                             <div className="table-cell">
-                                {complaint.submittedBy?.username || 'Unknown'}
+                                {complaint.user?.username || complaint.submittedBy?.username || 'Unknown'}
                             </div>
                             <div className="table-cell">
                                 {new Date(complaint.createdAt).toLocaleDateString()}
@@ -81,7 +87,8 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                                 </select>
                                 <button 
                                     className="view-btn"
-                                    onClick={() => {/* Handle view complaint details */}}
+                                    onClick={() => handleViewComplaint(complaint._id)}
+                                    title="View complaint details"
                                 >
                                     View
                                 </button>
@@ -190,6 +197,7 @@ const AdminDashboard = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
+        localStorage.removeItem('userRole');
         navigate('/login');
     };
 
@@ -233,8 +241,6 @@ const AdminDashboard = () => {
             return;
         }
 
-        
-
         const fetchAdminProfile = async () => {
             try {
                 const response = await fetch('http://localhost:4000/api/admin/profile', {
@@ -253,11 +259,21 @@ const AdminDashboard = () => {
 
         const fetchAllComplaints = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/complaints/admin/all', {
+                // Try the admin endpoint first, fallback to regular endpoint if needed
+                let response = await fetch('http://localhost:4000/api/complaints/admin/all', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                // If admin endpoint doesn't exist, try the regular complaints endpoint
+                if (!response.ok && response.status === 404) {
+                    response = await fetch('http://localhost:4000/api/complaints/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
 
                 if (response.ok) {
                     const data = await response.json();

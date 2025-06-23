@@ -213,3 +213,175 @@ exports.markComplaintAsSeen = asyncHandler(async (req, res, next) => {
 		data: complaint
 	});
 });
+
+// Backend/controllers/adminController.js
+
+
+// @desc    Get admin profile
+// @route   GET /api/admin/profile
+// @access  Private (Admin)
+exports.getAdminProfile = asyncHandler(async (req, res, next) => {
+	if (req.user) {
+		res.json({
+			username: req.user.username,
+			email: req.user.email,
+			role: req.user.role
+		});
+	} else {
+		return next(new ErrorResponse('Admin not found', 404));
+	}
+});
+
+// @desc    Update admin username
+// @route   PUT /api/admin/profile/username
+// @access  Private (Admin)
+exports.updateAdminUsername = asyncHandler(async (req, res, next) => {
+	const { newUsername } = req.body;
+
+	if (!newUsername || newUsername.trim().length < 3) {
+		return next(new ErrorResponse('New username must be at least 3 characters long', 400));
+	}
+
+	const user = req.user;
+
+	// Check if username already exists for another user
+	const usernameExists = await User.findOne({ username: newUsername });
+	if (usernameExists && usernameExists._id.toString() !== user._id.toString()) {
+		return next(new ErrorResponse('Username already taken', 400));
+	}
+
+	user.username = newUsername;
+	await user.save();
+
+	res.json({ 
+		message: 'Username updated successfully!', 
+		username: user.username 
+	});
+});
+
+// @desc    Request password reset OTP for admin (2FA)
+// @route   POST /api/admin/request-password-reset-otp
+// @access  Private (Admin)
+exports.requestPasswordResetOTP = asyncHandler(async (req, res, next) => {
+	const user = req.user;
+
+	// Generate a 6-digit numeric OTP
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+	// Set OTP expiry (10 minutes from now)
+	user.otp = otp;
+	user.otpExpires = Date.now() + 10 * 60 * 1000;
+	await user.save();
+
+	const mailOptions = {
+		to: user.email,
+		subject: 'Admin Password Reset OTP - Complaint Management System',
+		html: `
+			<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+				<h2 style="color: #e43939;">Admin Password Reset Request</h2>
+				<p>Hello <strong>${user.username}</strong>,</p>
+				<p>You recently requested to reset your admin account password. Your One-Time Password (OTP) is:</p>
+				<div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+					<h1 style="color: #e43939; font-size: 32px; margin: 0; letter-spacing: 4px;">${otp}</h1>
+				</div>
+				<p><strong>Important Security Notice:</strong></p>
+				<ul>
+					<li>This OTP is valid for <strong>10 minutes only</strong></li>
+					<li>Do not share this code with anyone</li>
+					<li>Only use this code if you requested a password reset</li>
+					<li>If you did not request this reset, please contact IT support immediately</li>
+				</ul>
+				<p>If you did not request a password reset, please ignore this email and contact your system administrator.</p>
+				<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+				<p style="color: #666; font-size: 12px;">
+					This is an automated message from the Strathmore Complaint Management System.<br>
+					Admin Panel Security Notice
+				</p>
+			</div>
+		`,
+	};
+
+	try {
+		await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
+		
+		res.status(200).json({ 
+			message: 'OTP sent to your registered admin email.',
+			email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email for security
+		});
+	} catch (error) {
+		// Clear OTP if email fails
+		user.otp = null;
+		user.otpExpires = null;
+		await user.save();
+		
+		return next(new ErrorResponse('Failed to send OTP email', 500));
+	}
+});
+
+// @desc    Reset admin password with OTP
+// @route   POST /api/admin/reset-password-with-otp
+// @access  Private (Admin)
+exports.resetPasswordWithOTP = asyncHandler(async (req, res, next) => {
+	const { otp, newPassword } = req.body;
+
+	if (!otp || !newPassword) {
+		return next(new ErrorResponse('Please provide OTP and new password', 400));
+	}
+
+	const user = req.user;
+
+	// Enhanced password validation for admin accounts
+	if (newPassword.length < 8) {
+		return next(new ErrorResponse('Admin password must be at least 8 characters long', 400));
+	}
+
+	// Check password complexity
+	const hasUpperCase = /[A-Z]/.test(newPassword);
+	const hasLowerCase = /[a-z]/.test(newPassword);
+	const hasNumbers = /\d/.test(newPassword);
+	
+	if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+		return next(new ErrorResponse('Admin password must contain at least one uppercase letter, one lowercase letter, and one number', 400));
+	}
+
+	// Verify OTP and expiry
+	if (!user.otp || user.otp !== otp || user.otpExpires < Date.now()) {
+		// Clear OTP fields to prevent brute-forcing
+		user.otp = null;
+		user.otpExpires = null;
+		await user.save();
+		return next(new ErrorResponse('Invalid or expired OTP', 400));
+	}
+
+	// Update password
+	user.password = newPassword;
+	user.otp = null;
+	user.otpExpires = null;
+	await user.save();
+
+	// Log security event
+	console.log(`Admin password reset completed for user: ${user.username} at ${new Date().toISOString()}`);
+
+	res.status(200).json({ 
+		message: 'Admin password reset successfully! You will be logged out for security.' 
+	});
+});
+
+
+// @desc    Get complaint details by ID (Admin)
+// @route   GET /api/admin/complaints/:id
+// @access  Private (Admin)
+exports.getComplaintById = asyncHandler(async (req, res, next) => {
+	const complaint = await Complaint.findById(req.params.id)
+		.populate('user', 'username email')
+		.populate('department', 'name description');
+
+	if (!complaint) {
+		return next(new ErrorResponse('Complaint not found', 404));
+	}
+
+	res.status(200).json({
+		success: true,
+		data: complaint
+	});
+});
