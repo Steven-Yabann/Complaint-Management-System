@@ -1,4 +1,4 @@
-// backend/Routes/complaintRoutes.js
+// Add these routes to your Backend/Routes/complaint_router.js
 
 const express = require('express');
 const { 
@@ -6,12 +6,10 @@ const {
     getUserComplaints, 
     getComplaint, 
     updateComplaint, 
-    deleteComplaint 
-} = require('../controllers/complaintController');
-const { 
+    deleteComplaint, 
     getAllComplaints, 
     updateComplaintStatus 
-} = require('../controllers/adminController');
+} = require('../controllers/complaintController');
 const { protect, authorize } = require('../middleware/auth');
 const router = express.Router();
 
@@ -19,11 +17,13 @@ const router = express.Router();
 router.route('/').post(protect, createComplaint);
 router.route('/me').get(protect, getUserComplaints);
 
-// Admin routes - moved to use adminController
+// Admin routes - get all complaints
 router.route('/admin/all').get(protect, authorize('admin'), getAllComplaints);
+
+// Admin routes - update complaint status
 router.route('/:id/status').put(protect, authorize('admin'), updateComplaintStatus);
 
-// Routes for specific complaints (user access)
+// Routes for specific complaints
 router.route('/:id')
     .get(protect, getComplaint)
     .put(protect, updateComplaint)

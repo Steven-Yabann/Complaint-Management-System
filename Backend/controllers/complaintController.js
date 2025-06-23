@@ -1,7 +1,7 @@
 // backend/controllers/complaint_controller.js
 
 const Complaint = require('../models/Complaint');
-const Department = require('../models/department');
+const Department = require('../models/Department');
 const User = require('../models/User'); // NEW: Make sure this line is present and correctly imports your User model.
 const multer = require('multer');
 const path = require('path');
@@ -150,6 +150,23 @@ exports.getUserComplaints = asyncHandler(async (req, res, next) => {
 
     const complaints = await Complaint.find({ user: req.user.id })
         .populate('department', 'name')
+        .populate('user', 'username email')
+        .sort({ createdAt: -1 });
+
+    res.status(200).json({
+        success: true,
+        count: complaints.length,
+        data: complaints
+    });
+});
+
+// @desc    Get all complaints (Admin only)
+// @route   GET /api/complaints/admin/all
+// @access  Private (Admin)
+exports.getAllComplaints = asyncHandler(async (req, res, next) => {
+    const complaints = await Complaint.find({})
+        .populate('department', 'name')
+        .populate('user', 'username email')
         .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -163,14 +180,16 @@ exports.getUserComplaints = asyncHandler(async (req, res, next) => {
 // @route   GET /api/complaints/:id
 // @access  Private (User/Admin) - Added for edit functionality
 exports.getComplaint = asyncHandler(async (req, res, next) => {
-    const complaint = await Complaint.findById(req.params.id).populate('department', 'name');
+    const complaint = await Complaint.findById(req.params.id)
+        .populate('department', 'name')
+        .populate('user', 'username email');
 
     if (!complaint) {
         return next(new ErrorResponse('Complaint not found', 404));
     }
 
     // Ensure user is the owner or an admin
-    if (complaint.user.toString() !== req.user.id && req.user.role !== 'admin') { // Assuming admin role
+    if (complaint.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
         return next(new ErrorResponse('Not authorized to view this complaint', 401));
     }
 
@@ -180,6 +199,67 @@ exports.getComplaint = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc    Update complaint status (Admin only)
+// @route   PUT /api/complaints/:id/status
+// @access  Private (Admin)
+exports.updateComplaintStatus = asyncHandler(async (req, res, next) => {
+    const { status } = req.body;
+
+    if (!status) {
+        return next(new ErrorResponse('Please provide a status', 400));
+    }
+
+    const validStatuses = ['Open', 'In Progress', 'Resolved', 'Closed'];
+    if (!validStatuses.includes(status)) {
+        return next(new ErrorResponse('Invalid status provided', 400));
+    }
+
+    const complaint = await Complaint.findById(req.params.id)
+        .populate('user', 'username email');
+
+    if (!complaint) {
+        return next(new ErrorResponse('Complaint not found', 404));
+    }
+
+    const oldStatus = complaint.status;
+    complaint.status = status;
+    complaint.updatedAt = Date.now();
+    
+    await complaint.save();
+
+    // Send email notification to the user about status change
+    try {
+        if (complaint.user && complaint.user.email) {
+            const mailOptions = {
+                to: complaint.user.email,
+                subject: `Complaint Status Updated - #${complaint._id.toString().substring(0, 8)}`,
+                html: `
+                    <p>Hello ${complaint.user.username},</p>
+                    <p>The status of your complaint has been updated.</p>
+                    <p><strong>Complaint Title:</strong> ${complaint.title}</p>
+                    <p><strong>Previous Status:</strong> ${oldStatus}</p>
+                    <p><strong>New Status:</strong> ${status}</p>
+                    <p><strong>Complaint ID:</strong> ${complaint._id}</p>
+                    <p>You can view the full details of your complaint by logging into your account.</p>
+                    <p>Thank you for your patience.</p>
+                    <p>Best regards,</p>
+                    <p>Your Complaint Management Team</p>
+                `,
+            };
+            await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
+            console.log(`Status update email sent to ${complaint.user.email} for complaint ID: ${complaint._id}`);
+        }
+    } catch (emailError) {
+        console.error('Error sending status update email:', emailError);
+        // Don't fail the status update if email fails
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Complaint status updated successfully!',
+        data: complaint
+    });
+});
 
 // @desc    Update a specific complaint by ID
 // @route   PUT /api/complaints/:id
