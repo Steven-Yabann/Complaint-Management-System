@@ -1,9 +1,10 @@
 // frontend/src/pages/UserDashboard.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import UserNavbar from '../components/userNavbar'; // Import the new Navbar component
 import '../styling/userDash.css';
 
+// Reusable components (QuickActions, ComplaintSummary, RecentComplaintsDisplay) remain the same
 const QuickActions = () => (
     <div className="dashboard-widget quick-actions">
         <h2>Quick Actions</h2>
@@ -56,8 +57,9 @@ const UserDashboard = () => {
     const [userComplaints, setUserComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [username, setUsername] = useState('User');
+    const [username, setUsername] = useState('User'); // Default to 'User'
 
+    // handleLogout function is now passed to the UserNavbar component
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
@@ -66,32 +68,35 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const user = localStorage.getItem('userData');
+        const storedUsername = localStorage.getItem('username'); // Get username from localStorage
+        if (storedUsername) {
+            setUsername(storedUsername); // Set username from localStorage immediately
+        }
+
         if (!token) {
             navigate('/login');
             return;
         }
 
-        console.log('User:', user);
-
         const fetchUserProfile = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/users/profile', { // Assuming this endpoint exists on your backend
+                const response = await fetch('http://localhost:4000/api/users/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setUsername(data.username);
-                    localStorage.setItem('username', data.username); // Update localStorage with actual username
+                    setUsername(data.username); // Update with fetched username
+                    localStorage.setItem('username', data.username); // Store in localStorage
                 } else {
                     console.error('Failed to fetch user profile:', await response.json());
-                    setUsername(localStorage.getItem('username') || 'User'); // Fallback
+                    // Fallback to 'User' or what was in localStorage
+                    setUsername(storedUsername || 'User');
                 }
             } catch (err) {
                 console.error('Network error fetching user profile:', err);
-                setUsername(localStorage.getItem('username') || 'User'); // Fallback
+                setUsername(storedUsername || 'User'); // Fallback
             }
         };
 
@@ -121,7 +126,7 @@ const UserDashboard = () => {
 
         fetchUserProfile();
         fetchUserComplaints();
-    }, [navigate]);
+    }, [navigate]); // Added navigate to dependency array
 
     if (loading) {
         return <div className="user-dashboard-container">Loading dashboard...</div>;
@@ -133,28 +138,12 @@ const UserDashboard = () => {
 
     return (
         <div className="user-dashboard-container">
-            <nav className="dashboard-sidebar">
-                <div className="sidebar-header">
-                    <div className="sidebar-profile">
-                        <svg className="profile-icon" viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                    </div>
-                </div>
-                <ul className="sidebar-links">
-                    <li><Link to="/dashboard">Dashboard</Link></li>
-                    <li><Link to="/ComplaintPage">File Complaint</Link></li>
-                    <li><Link to="/viewComplaints">View Complaints</Link></li>
-                    <li><Link to="/profile">Profile</Link></li> {/* Link to the new Profile page */}
-                    <li><Link to="/notifications">Notifications</Link></li>
-                    {/* REMOVED: <li><Link to="/settings">Settings</Link></li> */}
-                    <li><button onClick={handleLogout} className="logout-btn">Logout</button></li>
-                </ul>
-            </nav>
+            {/* Render the UserNavbar component */}
+            <UserNavbar username={username} onLogout={handleLogout} />
 
             <main className="dashboard-main-content">
                 <header className="main-content-header">
-                    <h1>Welcome, {username}</h1>
+                    <h1>Welcome, {username}!</h1> {/* Display fetched username */}
                 </header>
 
                 <section className="dashboard-widgets-grid">

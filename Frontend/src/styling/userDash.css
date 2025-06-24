@@ -1,95 +1,28 @@
-/* UserDashboard.css */
+/* frontend/src/styling/userDash.css */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 .user-dashboard-container {
     display: flex;
-    min-height: 100vh; /* Full height of the viewport */
-    background-color: #f4f7f6; /* Light background for the dashboard */
+    min-height: 100vh;
+    background-color: #f4f7f6;
     font-family: Arial, sans-serif;
-}
-
-/* Sidebar Styling */
-.dashboard-sidebar {
-    width: 250px;
-    background-color: #2c3e50; /* Dark blue/grey for sidebar */
-    color: white;
-    padding: 20px 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-header {
-    text-align: center;
-    margin-bottom: 20px;
-    padding: 0 20px;
-}
-
-.sidebar-profile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.profile-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ecf0f1;
-    margin-bottom: 10px;
-}
-
-.sidebar-profile h3 {
-    font-size: 1.1em;
     margin: 0;
-    color: #ecf0f1;
-}
-
-.sidebar-links {
-    list-style: none;
     padding: 0;
-    margin: 0;
-    flex-grow: 1;
+    width: 100vw;
+    overflow: hidden;
 }
 
-.sidebar-links li {
-    margin-bottom: 10px;
-}
-
-.sidebar-links a,
-.sidebar-links button {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px 25px;
-    font-size: 1.05em;
-    transition: all 0.3s ease;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    box-sizing: border-box; /* Critical */
-    border-left: 5px solid transparent; /* Reserve space */
-}
-
-.sidebar-links a:hover,
-.sidebar-links button:hover {
-    background-color: #34495e;
-    border-left: 5px solid #2980b9;
-    padding-left: 20px;
-}
-
-.sidebar-links .logout-btn {
-    margin-top: auto; /* Pushes logout to bottom */
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding-top: 20px;
-}
-/* Main Content Styling */
+/* --- Main Content Styling --- */
 .dashboard-main-content {
-    flex-grow: 1; /* Takes up remaining space */
+    flex-grow: 1;
     padding: 30px;
+    display: flex;
+    flex-direction: column;
 }
 
 .main-content-header {
@@ -104,12 +37,13 @@
     margin: 0;
 }
 
-/* Widgets Grid */
+/* --- Widgets Grid --- */
 .dashboard-widgets-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px;
-
+    flex-grow: 1;
+    align-items: start;
 }
 
 .dashboard-widget {
@@ -118,6 +52,8 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
 }
 
 .dashboard-widget:hover {
@@ -134,42 +70,89 @@
 }
 
 /* Quick Actions Specific */
-.quick-actions button {
-    display: block;
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.quick-actions h2 {
+    font-size: 1.5em;
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    font-size: 1.1em;
+    text-align: left;
+}
+
+.quick-actions .primary-btn,
+.quick-actions .secondary-btn {
+    display: block;
+    width: 90%;
+    max-width: 350px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 1.3em;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
 }
 
 .quick-actions .primary-btn {
-    background-color: #2980b9; /* Blue */
+    background-color: #2980b9;
     color: white;
     border: none;
 }
 
 .quick-actions .primary-btn:hover {
     background-color: #3498db;
+    transform: translateY(-2px);
 }
 
 .quick-actions .secondary-btn {
-    background-color: #f1c40f; /* Yellow */
+    background-color: #f1c40f;
     color: #333;
     border: none;
+    margin-bottom: 0;
 }
 
 .quick-actions .secondary-btn:hover {
     background-color: #f39c12;
+    transform: translateY(-2px);
 }
 
-/* Complaint Summary Specific */
+/* --- Complaint Summary Specific --- */
+.complaint-summary {
+    width: 86vh; /* Be careful with 'vh' for width, it's usually for height. Consider using 'vw' or 'auto' for responsive width. */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.complaint-summary h2 {
+    font-size: 1.5em;
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: left;
+}
+
 .summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+    flex-grow: 1;
+    padding-bottom: 15px;
 }
 
 .summary-item {
@@ -180,6 +163,10 @@
     font-size: 1.1em;
     color: #555;
     font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .summary-item span {
@@ -190,95 +177,116 @@
 }
 
 .summary-item.total span { color: #2c3e50; }
-.summary-item.pending span { color: #e74c3c; } /* Red */
-.summary-item.in-progress span { color: #f1c40f; } /* Yellow */
-.summary-item.resolved span { color: #27ae60; } /* Green */
+.summary-item.pending span { color: #e74c3c; }
+.summary-item.in-progress span { color: #f1c40f; }
+.summary-item.resolved span { color: #27ae60; }
 
-/* Recent Activities & Notifications Specific */
-.recent-activities ul,
-.notifications ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.recent-activities li,
-.notifications li {
-    background-color: #f9f9f9;
-    padding: 10px 15px;
-    border-left: 4px solid #2980b9; /* Accent border */
-    margin-bottom: 10px;
-    border-radius: 4px;
-    font-size: 0.95em;
-    color: #333;
-}
-
-/* Enhanced Notifications Styling */
-.dashboard-widget.notifications {
-    grid-column: 1 / -1; /* Span full width across the grid */
+/* --- Recent Complaints Display --- */
+.dashboard-widget.recent-complaints {
+    grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
 }
 
-.notifications h2 {
-    margin-bottom: 10px;
+.recent-complaints h2 {
+    margin-bottom: 15px;
 }
 
-.notifications ul {
+.recent-complaints ul {
     list-style: none;
     padding: 0;
     margin: 0;
     flex-grow: 1;
     overflow-y: auto;
-    max-height: 300px; /* Adjust based on your layout */
     padding-right: 10px;
 }
 
-/* Scrollbar styling (optional) */
-.notifications ul::-webkit-scrollbar {
-    width: 6px;
-}
-
-.notifications ul::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.notifications ul::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 3px;
-}
-
-.notifications li {
-    background-color: #fefefe;
-    padding: 15px 20px;
-    margin-bottom: 12px;
-    border-left: 5px solid #2980b9;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+.recent-complaints li {
+    background-color: #f9f9f9;
+    padding: 12px 15px;
+    border-left: 4px solid #2980b9;
+    margin-bottom: 10px;
+    border-radius: 4px;
     font-size: 0.95em;
     color: #333;
     line-height: 1.4;
-    transition: transform 0.2s ease;
 }
 
-.notifications li:hover {
-    transform: translateX(5px);
-    border-left-color: #3498db;
+.recent-complaints li strong {
+    color: #34495e;
 }
 
-/* Optional: Add time ago styles */
-.notifications li small {
+.recent-complaints .view-more-link {
     display: block;
-    margin-top: 6px;
-    color: #999;
-    font-size: 0.85em;
-}     
-.profile-icon {
-    fill: #ecf0f1; /* Icon color */
-    margin-bottom: 10px;
-    transition: fill 0.3s ease;
+    text-align: right;
+    margin-top: 15px;
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
 }
 
-.sidebar-profile:hover .profile-icon {
-    fill: #2980b9; /* Change color on hover */
-}  
+.recent-complaints .view-more-link:hover {
+    color: #3498db;
+}
+
+/* --- Responsive Adjustments for Main Content --- */
+
+@media (max-width: 992px) {
+    .main-content-header h1 {
+        font-size: 2em;
+    }
+    .dashboard-widgets-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-dashboard-container {
+        flex-direction: column;
+    }
+    .dashboard-main-content {
+        padding: 20px;
+    }
+    .main-content-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .dashboard-widgets-grid {
+        grid-template-columns: 1fr;
+    }
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-main-content {
+        padding: 15px;
+    }
+    .main-content-header h1 {
+        font-size: 1.8em;
+    }
+    .dashboard-widget h2 {
+        font-size: 1.3em;
+    }
+    .quick-actions .primary-btn,
+    .quick-actions .secondary-btn {
+        font-size: 1em;
+        padding: 10px;
+    }
+    .summary-item {
+        font-size: 1em;
+        padding: 12px;
+    }
+    .summary-item span {
+        font-size: 1.5em;
+    }
+    .recent-complaints li {
+        font-size: 0.9em;
+        padding: 10px 12px;
+    }
+}
