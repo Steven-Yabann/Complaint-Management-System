@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import '../styling/login.css';
-import registerImg from '../assets/register.avif'; 
+import registerImg from '../assets/stmb.jpg'; 
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -112,10 +112,11 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="auth-container register-view">
-            <div className="image-panel">
-                <img src={registerImg} alt="Register" />
-            </div>
+        <div className="login-page-wrapper">
+            <div className="auth-container register-view">
+                <div className="image-panel">
+                    <img src={registerImg} alt="Register" />
+                </div>
 
             <div className="form-panel">
                 <Link to="/" className="back-home-btn">Home</Link>
@@ -191,7 +192,7 @@ const RegisterPage = () => {
                 </form>
             </div>
         </div>
-    );
+    </div>);
 };
 
 export default RegisterPage;

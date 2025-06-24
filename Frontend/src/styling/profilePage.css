@@ -1,147 +1,297 @@
 /* frontend/src/styling/profilePage.css */
 
+/*
+* This CSS file specifically styles the content of the ProfilePage.
+* The overall page layout (sidebar + main content) is managed by `userDash.css`
+* via the `.user-dashboard-container` and `.dashboard-main-content` classes.
+* Therefore, `.profile-page-container` styles from the original are largely obsolete here.
+*/
+
+/* Remove or comment out the original .profile-page-container as its layout responsibilities are now with userDash.css */
+/*
 .profile-page-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align items to the top */
-    min-height: calc(100vh - 60px); /* Adjust based on your header/footer height */
+    align-items: flex-start;
+    min-height: calc(100vh - 60px);
     background-color: #f0f2f5;
     padding: 20px;
     box-sizing: border-box;
 }
+*/
 
+/* Styles for the main content wrapper of the profile page */
 .profile-form-wrapper {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 500px;
-    box-sizing: border-box;
-    text-align: center;
+    /* This element also has the .dashboard-widget class from userDash.css,
+       which provides general styling like background, padding, border-radius, and shadow.
+       We are overriding or enhancing specific properties here. */
+    width: 100%; /* Ensures it takes the full available width within its parent (.dashboard-main-content) */
+    max-width: 700px; /* Sets a maximum width for larger screens for better readability and aesthetics */
+    margin: 0 auto; /* Centers the wrapper horizontally on wider screens */
+    padding: 35px; /* Increased padding for a more spacious and premium feel */
+    text-align: left; /* Aligns text content to the left within the wrapper */
+    display: flex;
+    flex-direction: column; /* Stacks the profile sections vertically */
+    gap: 30px; /* Provides consistent spacing between the sections (username, password) */
+    /* Box-shadow and border-radius are largely inherited from .dashboard-widget from userDash.css */
+    /* Example from userDash.css .dashboard-widget:
+       background: #fff;
+       border-radius: 8px;
+       box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
+       padding: 30px;
+    */
 }
 
+/* Styling for the main heading (e.g., "User Profile") */
 .profile-form-wrapper h2 {
-    color: #333;
+    color: #34495e; /* Uses a deep blue-grey for consistency with dashboard headings */
     margin-bottom: 25px;
-    font-size: 1.8em;
-    border-bottom: 2px solid #007bff;
+    font-size: 2em; /* Larger font size for prominence */
+    border-bottom: 2px solid #ecf0f1; /* A subtle, light grey border to match dashboard section dividers */
     padding-bottom: 10px;
-    display: inline-block; /* To make border-bottom only as wide as text */
+    display: block; /* Ensures the border spans the full width */
+    text-align: center; /* Centers the heading text */
 }
 
+/* Styling for individual profile sections (e.g., "Change Username", "Reset Password") */
 .profile-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background-color: #f9f9f9;
+    padding: 25px; /* Consistent internal padding */
+    border: 1px solid #dcdcdc; /* Lighter, subtle border */
+    border-radius: 8px; /* Rounded corners for a softer look */
+    background-color: #ffffff; /* White background for clarity */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Soft, subtle shadow to lift the section */
+    transition: transform 0.2s ease-in-out; /* Smooth transition for hover effect */
 }
 
+.profile-section:hover {
+    transform: translateY(-3px); /* Causes the section to lift slightly on hover, adding interactivity */
+}
+
+/* Styling for sub-headings within profile sections (e.g., "Change Username") */
 .profile-section h3 {
-    color: #555;
-    margin-bottom: 15px;
-    font-size: 1.4em;
+    color: #2c3e50; /* Darker blue-grey for clear hierarchy */
+    margin-bottom: 20px;
+    font-size: 1.6em; /* Appropriate size for a sub-heading */
+    border-bottom: 1px solid #eee; /* Light separator below the sub-heading */
+    padding-bottom: 10px;
 }
 
+/* General paragraph styling within profile sections */
 .profile-section p {
     margin-bottom: 15px;
-    color: #666;
+    color: #4a4a4a; /* Medium grey for good readability */
+    line-height: 1.6; /* Improved line spacing */
 }
 
+/* Styling for form groups (label + input/select) */
 .profile-form .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* More vertical space between form elements */
     text-align: left;
 }
 
+/* Styling for form labels */
 .profile-form .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-weight: bold;
-    color: #333;
-}
-
-.profile-form .form-group input {
-    width: calc(100% - 20px); /* Adjust for padding */
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
-    box-sizing: border-box;
-}
-
-.submit-btn {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    color: #34495e; /* Consistent color with headings */
     font-size: 1.1em;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-    width: auto; /* Allow button to size based on content */
-    display: inline-block; /* To prevent full width */
+}
+
+/* Styling for form input fields */
+.profile-form .form-group input {
+    width: 100%; /* Makes inputs take full width of their container */
+    padding: 14px 15px; /* Generous padding for better usability, especially on touch devices */
+    border: 1px solid #c0c0c0; /* Subtle border */
+    border-radius: 6px; /* Slightly rounded corners */
+    font-size: 1.1em; /* Larger font size for better readability */
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus effects */
+}
+
+/* Focus state for input fields */
+.profile-form .form-group input:focus {
+    border-color: #2980b9; /* Highlight border with primary blue color */
+    outline: none; /* Remove default browser outline */
+    box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2); /* Soft blue glow on focus */
+}
+
+/* Styling for submit buttons */
+.submit-btn {
+    background-color: #2980b9; /* Primary blue color, consistent with dashboard buttons */
+    color: white;
+    padding: 14px 30px; /* Generous padding */
+    border: none;
+    border-radius: 8px; /* More rounded corners */
+    cursor: pointer;
+    font-size: 1.2em; /* Larger font size */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    margin-top: 20px;
+    width: 100%; /* Full width for better mobile tap targets */
+    max-width: 300px; /* Maximum width on larger screens */
+    display: block; /* Ensures block-level behavior for centering */
+    margin-left: auto; /* Centers the button horizontally */
+    margin-right: auto; /* Centers the button horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 .submit-btn:hover {
-    background-color: #0056b3;
+    background-color: #3498db; /* Lighter blue on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
 }
 
 .submit-btn:disabled {
-    background-color: #cccccc;
+    background-color: #cccccc; /* Greyed out when disabled */
     cursor: not-allowed;
+    transform: none; /* No lift effect when disabled */
+    box-shadow: none; /* No shadow when disabled */
 }
 
+/* Styling for success/error messages */
 .form-message {
-    padding: 10px 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
     font-weight: bold;
     text-align: center;
+    font-size: 1.1em;
 }
 
 .form-message.success {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
     border: 1px solid #c3e6cb;
 }
 
 .form-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text */
     border: 1px solid #f5c6cb;
 }
 
+/* Styling for horizontal rule divider */
 .section-divider {
     border: 0;
     height: 1px;
     background: #e0e0e0;
-    margin: 30px 0;
+    margin: 40px 0; /* Generous vertical spacing */
 }
 
+/* Styling for informational text */
 .info-text {
-    font-size: 0.9em;
-    color: #888;
-    margin-bottom: 15px;
-}
-
-.back-to-dashboard-container {
-    margin-top: 30px;
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 20px;
     text-align: center;
 }
 
+/* Remove these styles as the back button is handled by Navbar now */
+.back-to-dashboard-container,
 .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
+    display: none;
 }
 
-.btn-secondary:hover {
-    background-color: #5a6268;
+
+/* --- Responsive Adjustments --- */
+
+/* For tablets and smaller desktops (screens up to 768px wide) */
+@media (max-width: 768px) {
+    .profile-form-wrapper {
+        padding: 25px; /* Slightly less padding */
+        max-width: 100%; /* Allow the form wrapper to take full width */
+        margin: 0; /* Remove auto margins to prevent extra space */
+        box-shadow: none; /* Remove outer shadow for a cleaner look on full-width layout */
+        gap: 25px; /* Slightly reduced gap between sections */
+    }
+
+    .profile-form-wrapper h2 {
+        font-size: 1.6em; /* Adjust heading size */
+        margin-bottom: 20px;
+    }
+
+    .profile-section {
+        padding: 20px; /* Slightly less padding for sections */
+        margin-bottom: 25px; /* Maintained gap for consistency */
+        box-shadow: none; /* Remove inner section shadows on smaller screens */
+    }
+
+    .profile-section h3 {
+        font-size: 1.3em; /* Adjust section heading size */
+        margin-bottom: 15px;
+    }
+
+    .profile-form .form-group input {
+        padding: 12px; /* Adjust input padding */
+        font-size: 1em; /* Adjust input font size */
+    }
+
+    .submit-btn {
+        padding: 12px 25px;
+        font-size: 1.1em;
+        width: 100%; /* Ensure full width */
+        max-width: none; /* Override max-width set for larger screens */
+    }
+
+    .form-message {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+
+    .section-divider {
+        margin: 30px 0;
+    }
+
+    .info-text {
+        font-size: 0.9em;
+        margin-bottom: 15px;
+    }
+}
+
+/* For mobile phones (screens up to 480px wide) */
+@media (max-width: 480px) {
+    .profile-form-wrapper {
+        padding: 15px; /* Further reduce padding */
+        gap: 20px; /* Further reduce gap on very small screens */
+    }
+
+    .profile-form-wrapper h2 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+    }
+
+    .profile-section {
+        padding: 15px; /* Further reduce section padding */
+        margin-bottom: 20px; /* Maintained gap */
+    }
+
+    .profile-section h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    .profile-form .form-group label {
+        font-size: 1em;
+        margin-bottom: 5px;
+    }
+
+    .profile-form .form-group input {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .submit-btn {
+        padding: 10px 20px;
+        font-size: 1em;
+        margin-top: 15px;
+    }
+
+    .form-message {
+        font-size: 0.9em;
+        padding: 10px;
+    }
+    .section-divider {
+        margin: 20px 0;
+    }
 }
