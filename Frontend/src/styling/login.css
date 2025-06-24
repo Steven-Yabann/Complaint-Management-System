@@ -1,26 +1,54 @@
-/* Main Container */
+/* frontend/src/styling/login.css */
+
+/* Overall Page Layout - REMOVED global html, body styles */
+
+/* New wrapper for centering the login page */
+.login-page-wrapper {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh; /* Takes full viewport height */
+    width: 100vw; /* Takes full viewport width */
+    overflow: hidden; /* Hide scrollbars if content overflows */
+    background-color: #f0f2f5; /* Consistent background for the login page */
+    font-family: 'Inter', sans-serif; /* Consistent font */
+}
+
+
+/* Main Container - Centered and Responsive */
 .auth-container {
     display: flex;
-    width: 900px;
-    height: 650px;
-    margin: 0rem auto;
+    width: 90%; /* Take 90% of parent width */
+    max-width: 900px; /* Max width to prevent it from getting too wide on large screens */
+    height: auto; /* Height adapts to content */
+    min-height: 550px; /* Minimum height for better presentation */
     background: #fff;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Slightly stronger shadow */
     overflow: hidden;
+    margin: 20px; /* Add some margin for spacing from viewport edges */
 }
 
 /* Image Panel */
 .image-panel {
     flex: 1;
     overflow: hidden;
+    display: flex; /* Use flex to center image content */
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8; /* Fallback background for image panel */
 }
 
 .image-panel img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    display: block; /* Remove extra space below image */
+    transition: transform 0.6s ease-in-out; /* Slower and smoother transition */
+}
+
+.image-panel img:hover {
+    transform: scale(1.03) rotate(1deg); /* Subtle scale up and rotation */
 }
 
 /* Form Panel */
@@ -28,14 +56,16 @@
     position: relative;
     flex: 1;
     display: flex;
+    flex-direction: column; /* Stack content vertically */
     justify-content: center;
     align-items: center;
-    padding: 2rem;
+    padding: 2.5rem 3rem; /* More padding for spacious feel */
+    text-align: center; /* Center text within the panel */
 }
 
-/* Layout Switching */
+/* Layout Switching (kept for future use, not directly affecting this login page) */
 .login-view {
-    flex-direction: row;
+    flex-direction: row; /* Default for wide screens */
 }
 
 .register-view {
@@ -44,79 +74,91 @@
 
 /* Form Styles */
 h1 {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem; /* Increased margin */
     color: #333;
-    font-size: 3rem;
+    font-size: 2.8rem; /* Slightly adjusted for better fit */
+    font-weight: 700; /* Bolder for impact */
 }
 
 .input-group {
     position: relative;
-    margin-bottom: 2rem;
-}
-
-.input-group input {
-    width: 100%;
-    border: none;
-    border-bottom: 2px solid #ddd;
-    padding: 8px 0;
-    font-size: 1rem;
-    background: transparent;
-    outline: none;
+    margin-bottom: 1.8rem; /* Adjusted margin */
+    width: 100%; /* Ensure input group takes full width available in form */
+    display: flex; /* Align icon and input */
+    align-items: center;
+    border-bottom: 2px solid #ddd; /* Move border to input-group for consistency with underline effect */
+    padding-bottom: 5px; /* Space for the underline */
     transition: border-color 0.3s ease;
 }
 
-/* Animated underline effect */
-.input-group input:focus {
-    border-bottom-color: transparent; /* Hide default border */
+.input-group input {
+    flex-grow: 1; /* Allow input to take remaining space */
+    border: none; /* Remove individual input border */
+    padding: 8px 0;
+    font-size: 1.1rem; /* Slightly larger font */
+    background: transparent;
+    outline: none;
 }
 
+/* Animated underline effect */
 .input-group::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -2px; /* Position it correctly under the input group */
     left: 0;
     width: 0;
     height: 2px;
     background-color: #f7901e;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease-out; /* Use ease-out for smoother effect */
 }
 
 .input-group:focus-within::after {
     width: 100%;
 }
 
-/* Keep your icon styles */
+.input-group:focus-within {
+    border-bottom-color: transparent; /* Hide default border on focus */
+}
+
+
+/* Icon styles */
 .input-group span {
-    margin-right: 10px;
+    margin-right: 15px; /* More space for icons */
     color: #777;
-    font-size: 1.2rem;
+    font-size: 1.4rem; /* Larger icons */
+    line-height: 1; /* Ensure vertical alignment */
 }
 
 .primary-btn {
     width: 100%;
-    padding: 12px;
-    margin-top: 1rem;
+    padding: 15px; /* More padding for a bigger button */
+    margin-top: 2rem; /* Increased margin */
     border: none;
-    border-radius: 6px;
+    border-radius: 8px; /* More rounded corners */
     background: #f7901e;
     color: white;
-    font-size: 1rem;
+    font-size: 1.2rem; /* Larger font */
+    font-weight: 600; /* Bolder text */
     cursor: pointer;
-    transition: ease-in-out 0.3s;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Add transform and shadow transition */
+    box-shadow: 0 4px 10px rgba(247, 144, 30, 0.2); /* Subtle initial shadow */
 }
 
 .primary-btn:hover {
     background: #e07e0c;
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 6px 15px rgba(247, 144, 30, 0.3); /* More pronounced shadow */
 }
 
 .form-footer {
-    margin-top: 1.5rem;
+    margin-top: 2rem; /* Increased margin */
     text-align: center;
 }
 
 .form-footer p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
     color: #666;
+    font-size: 1em;
 }
 
 .switch-btn {
@@ -124,8 +166,25 @@ h1 {
     border: none;
     color: #f7901e;
     cursor: pointer;
-    font-weight: 600;
-    text-decoration: underline;
+    font-weight: 700; /* Bolder */
+    text-decoration: none; /* Remove default underline */
+    position: relative; /* For custom underline effect */
+    padding-bottom: 2px; /* Space for the underline */
+}
+
+.switch-btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #f7901e;
+    transition: width 0.3s ease;
+}
+
+.switch-btn:hover::after {
+    width: 100%;
 }
 
 .switch-btn:hover {
@@ -133,32 +192,156 @@ h1 {
 }
 
 .error-message {
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    color: #ff4444;
-    font-size: 0.8rem;
-    margin-top: -1rem;
-    margin-bottom: 1rem;
+    font-family: Arial, sans-serif; /* Changed from Cambria for wider compatibility */
+    color: #e74c3c; /* Brighter red for errors */
+    font-size: 0.9em; /* Slightly larger for readability */
+    margin-top: -1.2rem; /* Adjusted to pull up closer to input */
+    margin-bottom: 1.2rem; /* Ensure space below */
     text-align: left;
     width: 100%;
-    padding-left: 1.5rem;
+    padding-left: 35px; /* Align with input start after icon */
+    box-sizing: border-box;
 }
 
 .input-group:has(+ .error-message) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem; /* Reduce margin when error message is present */
 }
+
+.message {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1em;
+    width: 100%; /* Make messages take full width */
+    box-sizing: border-box;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* Back Home Button - Adjusted positioning */
 .back-home-btn {
-    font-family:sans-serif;
+    font-family: 'Inter', sans-serif;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 25px; /* Slightly more space from top */
+    left: 30px; /* Slightly more space from left */
     color: #ff7300;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 1em;
     display: flex;
     align-items: center;
+    gap: 5px; /* Space between arrow and text */
     transition: color 0.3s ease-in-out;
+    padding: 5px 10px; /* Add some padding for easier clicking */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.back-home-btn::before {
+    content: '←'; /* Unicode left arrow */
+    font-size: 1.2em; /* Make arrow slightly bigger */
 }
 
 .back-home-btn:hover {
     color: #955104;
+    background-color: rgba(255, 115, 0, 0.1); /* Subtle background on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column; /* Stack panels vertically on smaller screens */
+        width: 95%; /* Take more width on smaller screens */
+        min-height: auto; /* Auto height */
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Lighter shadow when stacked */
+    }
+
+    .image-panel {
+        height: 250px; /* Fixed height for image panel when stacked */
+        width: 100%; /* Take full width when stacked */
+        order: 1; /* Place image panel at the top when stacked */
+    }
+
+    .form-panel {
+        order: 2; /* Place form panel below image when stacked */
+        padding: 2rem; /* Adjusted padding for stacked layout */
+        width: 100%; /* Take full width when stacked */
+    }
+
+    h1 {
+        font-size: 2.2rem; /* Smaller heading on mobile */
+        margin-bottom: 2rem;
+    }
+
+    .primary-btn {
+        padding: 12px;
+        font-size: 1.1rem;
+    }
+
+    .input-group span {
+        font-size: 1.1rem;
+        margin-right: 10px;
+    }
+
+    .input-group input {
+        font-size: 1em;
+    }
+
+    .error-message {
+        font-size: 0.85em;
+        padding-left: 25px; /* Adjust padding for smaller icons */
+    }
+
+    .back-home-btn {
+        top: 15px; /* Adjust positioning for smaller screens */
+        left: 15px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        border-radius: 10px; /* Slightly less rounded on very small screens */
+    }
+
+    .image-panel {
+        height: 200px; /* Even smaller image height */
+    }
+
+    .form-panel {
+        padding: 1.5rem; /* Further reduced padding */
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .input-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .primary-btn {
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    .form-footer {
+        margin-top: 1rem;
+    }
+
+    .error-message {
+        padding-left: 20px; /* Further adjust padding */
+    }
 }
