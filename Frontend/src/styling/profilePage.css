@@ -64,7 +64,7 @@
 }
 
 .profile-section:hover {
-    transform: translateY(-3px); /* Causes the section to lift slightly on hover, adding interactivity */
+    border: 0.5px solid #1e42f7; 
 }
 
 /* Styling for sub-headings within profile sections (e.g., "Change Username") */
