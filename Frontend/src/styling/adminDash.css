@@ -710,3 +710,496 @@ mark {
         font-size: 0.8em;
     }
 }
+
+/* Enhanced Analytics Styles - Add these to adminDash.css */
+
+/* Analytics Header */
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.analytics-header h1 {
+    margin: 0;
+    color: #343a40;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+
+.analytics-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Download Buttons */
+.download-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.download-btn.primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.download-btn.primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.download-btn.secondary {
+    background-color: #6c757d;
+    color: white;
+    font-size: 0.8em;
+    padding: 6px 12px;
+}
+
+.download-btn.secondary:hover {
+    background-color: #545b62;
+}
+
+.download-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Charts Section */
+.charts-section {
+    margin: 40px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 30px;
+}
+
+.chart-container {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.chart-header h3 {
+    margin: 0;
+    color: #495057;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+/* Tables Section */
+.tables-section {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.table-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-header h3 {
+    margin: 0;
+    color: #495057;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+/* Analytics Tables */
+.analytics-table-wrapper {
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.analytics-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 15px 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.analytics-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    color: #495057;
+    vertical-align: middle;
+}
+
+.analytics-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.analytics-table tbody tr:nth-child(even) {
+    background-color: #fdfdfe;
+}
+
+/* Progress Bar */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 50px 50px;
+    animation: move 2s linear infinite;
+}
+
+@keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+/* Status Badges in Tables */
+.analytics-table .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+}
+
+.analytics-table .status-badge.open {
+    background-color: #fee;
+    color: #dc3545;
+    border: 1px solid #f5c6cb;
+}
+
+.analytics-table .status-badge.in-progress {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.analytics-table .status-badge.resolved,
+.analytics-table .status-badge.closed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Rating Display */
+.rating-display {
+    display: flex;
+    gap: 2px;
+    font-size: 1.1em;
+}
+
+.rating-display .star {
+    color: #ddd;
+    transition: color 0.2s ease;
+}
+
+.rating-display .star.filled {
+    color: #ffc107;
+}
+
+/* Enhanced Analytics Cards */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.analytics-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.analytics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-card h3 {
+    font-size: 1em;
+    color: #6c757d;
+    margin: 0 0 15px 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.analytics-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #343a40;
+    display: block;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+/* Responsive Design for Analytics */
+@media (max-width: 1200px) {
+    .charts-section {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+    }
+    
+    .analytics-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .analytics-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .chart-container {
+        padding: 15px;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .analytics-table th,
+    .analytics-table td {
+        padding: 8px 6px;
+        font-size: 0.8em;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    
+    .analytics-card {
+        padding: 20px 15px;
+    }
+    
+    .analytics-number {
+        font-size: 2em;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 15px 20px;
+    }
+    
+    .download-btn {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .analytics-table-wrapper {
+        font-size: 0.75em;
+    }
+    
+    .analytics-table th,
+    .analytics-table td {
+        padding: 6px 4px;
+    }
+    
+    .chart-container {
+        padding: 10px;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-card {
+        padding: 15px 10px;
+    }
+    
+    .analytics-number {
+        font-size: 1.8em;
+    }
+    
+    .progress-bar {
+        height: 6px;
+    }
+    
+    .rating-display {
+        font-size: 0.9em;
+    }
+}
+
+/* Loading States */
+.analytics-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #6c757d;
+    font-size: 1.1em;
+}
+
+.analytics-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Custom Scrollbar for Tables */
+.analytics-table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.analytics-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.analytics-table-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.analytics-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Tooltip Enhancements */
+.recharts-tooltip-wrapper {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.recharts-default-tooltip {
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Print Styles */
+@media print {
+    .analytics-actions,
+    .download-btn {
+        display: none;
+    }
+    
+    .chart-container,
+    .table-container {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    .analytics-container {
+        background: white;
+    }
+}
