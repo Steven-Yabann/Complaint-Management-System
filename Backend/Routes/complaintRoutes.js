@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 // Import your authentication and authorization middleware
-const { protect, authorize } = require('../middleware/auth'); // Ensure this path is correct: ../middleware/auth or ../middleware/authMiddleware
+const { protect, authorize, authorizeAdminWithDepartment } = require('../middleware/auth');
 
 // Import your complaint controller functions
 const {
@@ -12,8 +12,8 @@ const {
     getComplaint,
     updateComplaint,
     deleteComplaint,
-    getAllComplaintsForAdmin // Make SURE this name matches the export in complaint_controller.js
-} = require('../controllers/complaintController'); // Path to your complaint controller
+    getAllComplaintsForAdmin
+} = require('../controllers/complaintController');
 
 // --- User-specific complaint routes ---
 router.route('/')
@@ -23,9 +23,9 @@ router.route('/me')
     .get(protect, getUserComplaints);
 
 // --- Admin-specific complaint routes ---
-// Route to get all complaints for the admin dashboard
+// Route to get all complaints for the admin dashboard (now filtered by department)
 router.route('/admin/all')
-    .get(protect, authorize('admin'), getAllComplaintsForAdmin); // <-- This is where the function is used
+    .get(protect, authorizeAdminWithDepartment(), getAllComplaintsForAdmin);
 
 // --- Routes for specific complaints by ID (common for both users and admins) ---
 router.route('/:id')

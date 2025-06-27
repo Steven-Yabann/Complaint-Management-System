@@ -4,18 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run kill-port && vite",
+    "kill-port": "lsof -ti:5173 | xargs kill -9 2>/dev/null || true",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "chart": "^0.1.2",
+    "chart.js": "^4.5.0",
     "jwt-decode": "^4.0.0",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.5.3"
+    "react-router-dom": "^7.5.3",
+    "recharts": "^3.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
