@@ -1,27 +1,31 @@
 // backend/Routes/complaintRoutes.js
 
 const express = require('express');
-const { 
-    createComplaint, 
-    getUserComplaints, 
-    getComplaint, 
-    updateComplaint, 
-    deleteComplaint, 
-    getAllComplaints, 
-    updateComplaintStatus 
-} = require('../controllers/complaintController');
-const { protect, authorize } = require('../middleware/auth');
 const router = express.Router();
+// Import your authentication and authorization middleware
+const { protect, authorize, authorizeAdminWithDepartment } = require('../middleware/auth');
 
-// User routes
-router.route('/').post(protect, createComplaint);
-router.route('/me').get(protect, getUserComplaints);
+// Import your complaint controller functions
+const {
+    createComplaint,
+    getUserComplaints,
+    getComplaint,
+    updateComplaint,
+    deleteComplaint,
+    getAllComplaintsForAdmin
+} = require('../controllers/complaintController');
 
-// Admin routes - get all complaints
-// router.route('/admin/all').get(protect, authorize('admin'), getAllComplaints);
+// --- User-specific complaint routes ---
+router.route('/')
+    .post(protect, createComplaint);
 
-// Admin routes - update complaint status
-// router.route('/:id/status').put(protect, authorize('admin'), updateComplaintStatus);
+router.route('/me')
+    .get(protect, getUserComplaints);
+
+// --- Admin-specific complaint routes ---
+// Route to get all complaints for the admin dashboard (now filtered by department)
+router.route('/admin/all')
+    .get(protect, authorizeAdminWithDepartment(), getAllComplaintsForAdmin);
 
 // --- Routes for specific complaints by ID (common for both users and admins) ---
 router.route('/:id')

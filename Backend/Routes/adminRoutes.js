@@ -15,8 +15,27 @@ const {
 } = require('../controllers/adminController');
 
 // Admin Profile Routes
-router.route('/profile')
-	.get(protect, authorize('admin'), getAdminProfile);
+router.get('/profile', protect, authorize('admin'), async (req, res) => {
+    try {
+        if (req.user) {
+            // Populate the department information if it exists
+            const adminWithDept = await req.user.populate('department', 'name');
+            
+            res.json({
+                username: req.user.username,
+                email: req.user.email,
+                role: req.user.role,
+                department: adminWithDept.department?.name || null, // Get department name
+                departmentId: req.user.department || null // Include ObjectId for reference
+            });
+        } else {
+            res.status(404).json({ message: 'Admin not found.' });
+        }
+    } catch (error) {
+        console.error("Error fetching admin profile:", error);
+        res.status(500).json({ message: 'Server error fetching profile data.' });
+    }
+});
 
 router.route('/profile/username')
 	.put(protect, authorize('admin'), updateAdminUsername);

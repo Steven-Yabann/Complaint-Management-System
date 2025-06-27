@@ -372,18 +372,38 @@ exports.updateComplaint = asyncHandler(async (req, res, next) => {
 // @desc    Get all complaints (for admin dashboard)
 // @route   GET /api/complaints/admin/all
 // @access  Private (Admin only)
-exports.getAllComplaintsForAdmin = asyncHandler(async (req, res, next) => { // <<<--- DEFINITION AND EXPORT HERE
-    // No role check needed here as 'authorize('admin')' middleware handles it
-    const complaints = await Complaint.find()
-        .populate('user', 'username email') // Populate user details who filed the complaint
-        .populate('department', 'name')     // Populate department name
-        .sort({ createdAt: -1 }); // Sort by newest first
+exports.getAllComplaintsForAdmin = asyncHandler(async (req, res, next) => {
+    // Get the admin's department ObjectId from the authenticated user
+    const adminDepartmentId = req.user.department;
+    
+    if (!adminDepartmentId) {
+        return next(new ErrorResponse('Admin user does not have a department assigned', 400));
+    }
 
-    res.status(200).json({
-        success: true,
-        count: complaints.length,
-        data: complaints
-    });
+    try {
+        // Filter complaints by the admin's department ObjectId directly
+        const complaints = await Complaint.find({ department: adminDepartmentId })
+            .populate('user', 'username email') // Populate user details who filed the complaint
+            .populate('department', 'name')     // Populate department name for display
+            .sort({ createdAt: -1 }); // Sort by newest first
+
+        // Get the department name for the response (from the first complaint if available)
+        const adminDepartmentName = complaints.length > 0 
+            ? complaints[0].department?.name 
+            : 'Unknown Department';
+
+        res.status(200).json({
+            success: true,
+            count: complaints.length,
+            data: complaints,
+            adminDepartment: adminDepartmentName,
+            adminDepartmentId: adminDepartmentId // Include ObjectId for debugging
+        });
+
+    } catch (error) {
+        console.error('Error fetching department-filtered complaints:', error);
+        return next(new ErrorResponse('Error retrieving complaints for department', 500));
+    }
 });
 
 

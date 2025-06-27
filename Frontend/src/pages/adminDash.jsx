@@ -4,9 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styling/adminDash.css';
 
-const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
-    const navigate = useNavigate();
-
+const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'open': return 'status-open';
@@ -21,44 +19,35 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
             const token = localStorage.getItem('token');
             if (!token) {
                 console.error('No token found. User not authenticated.');
-                // Optionally redirect or show an error to the user
                 return;
             }
 
-            // *** THE CRITICAL CHANGE IS HERE: Remove '/status' from the URL ***
             const response = await fetch(`http://localhost:4000/api/complaints/${complaintId}`, {
-                method: 'PUT', // Method remains PUT
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ status: newStatus }) // Send the status in the request body
+                body: JSON.stringify({ status: newStatus })
             });
 
             if (response.ok) {
-                // If the backend call is successful, update the parent component's state
-                // This will re-render the table with the new status
                 onStatusUpdate(complaintId, newStatus);
                 console.log(`Complaint ${complaintId} status updated to ${newStatus}`);
             } else {
                 const errorData = await response.json();
                 console.error('Failed to update complaint status:', errorData.message || 'Unknown error');
-                // You might want to display this error to the admin user in the UI
             }
         } catch (error) {
             console.error('Error updating complaint status:', error);
-            // Handle network errors
         }
-    };
-
-    const handleViewComplaint = (complaintId) => {
-        navigate(`/complaint/${complaintId}`);
     };
 
     return (
         <div className="complaints-table-container">
             <div className="complaints-header">
-                <h1>Complaints</h1>
+                <h1>Complaints - {adminDepartment} Department</h1>
+                <p className="department-subtitle">Managing complaints for the {adminDepartment} department</p>
             </div>
             <div className="complaints-table">
                 <div className="table-header">
@@ -69,7 +58,9 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                     <div className="header-cell">ACTIONS</div>
                 </div>
                 {complaints.length === 0 ? (
-                    <div className="no-complaints">No complaints to display</div>
+                    <div className="no-complaints">
+                        No complaints to display for {adminDepartment} department
+                    </div>
                 ) : (
                     complaints.map(complaint => (
                         <div key={complaint._id} className="table-row">
@@ -82,7 +73,6 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                                 </span>
                             </div>
                             <div className="table-cell">
-                                {/* Ensure complaint.user is populated and has username */}
                                 {complaint.user?.username || 'Unknown'} 
                             </div>
                             <div className="table-cell">
@@ -101,8 +91,7 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                                 </select>
                                 <button 
                                     className="view-btn"
-                                    onClick={() => handleViewComplaint(complaint._id)}
-                                    title="View complaint details"
+                                    onClick={() => {/* Handle view complaint details */}}
                                 >
                                     View
                                 </button>
@@ -115,16 +104,17 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
     );
 };
 
-const DashboardOverview = ({ complaints }) => {
+const DashboardOverview = ({ complaints, adminDepartment }) => {
     const total = complaints.length;
     const open = complaints.filter(c => c.status === 'Open').length;
     const inProgress = complaints.filter(c => c.status === 'In Progress').length;
     const resolved = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
-    const unseenCount = complaints.filter(c => !c.seen).length; // Check if this `seen` property actually exists and is updated
+    const unseenCount = complaints.filter(c => !c.seen).length;
 
     return (
         <div className="dashboard-overview">
-            <h1>Dashboard</h1>
+            <h1>Dashboard - {adminDepartment} Department</h1>
+            <p className="department-subtitle">Overview of complaints for the {adminDepartment} department</p>
             <div className="overview-stats">
                 <div className="stat-card total">
                     <h3>Total Complaints</h3>
@@ -145,14 +135,19 @@ const DashboardOverview = ({ complaints }) => {
             </div>
             {unseenCount > 0 && (
                 <div className="unseen-notification">
-                    You have {unseenCount} unseen complaint{unseenCount !== 1 ? 's' : ''}
+                    You have {unseenCount} unseen complaint{unseenCount !== 1 ? 's' : ''} in {adminDepartment}
+                </div>
+            )}
+            {total === 0 && (
+                <div className="no-department-complaints">
+                    <p>No complaints have been filed for the {adminDepartment} department yet.</p>
                 </div>
             )}
         </div>
     );
 };
 
-const Analytics = ({ complaints }) => {
+const Analytics = ({ complaints, adminDepartment }) => {
     const getAnalytics = () => {
         const total = complaints.length;
         const thisMonth = complaints.filter(c => {
@@ -172,7 +167,8 @@ const Analytics = ({ complaints }) => {
 
     return (
         <div className="analytics-container">
-            <h1>Analytics</h1>
+            <h1>Analytics - {adminDepartment} Department</h1>
+            <p className="department-subtitle">Performance metrics for the {adminDepartment} department</p>
             <div className="analytics-grid">
                 <div className="analytics-card">
                     <h3>Total Complaints</h3>
@@ -191,7 +187,6 @@ const Analytics = ({ complaints }) => {
                     <span className="analytics-number">{analytics.satisfactionRate}</span>
                 </div>
             </div>
-            {/* Add charts and graphs here */}
         </div>
     );
 };
@@ -204,6 +199,7 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [adminName, setAdminName] = useState('Admin');
+    const [adminDepartment, setAdminDepartment] = useState('');
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
     const currentView = location.pathname.split('/').pop() || 'dashboard';
@@ -211,21 +207,16 @@ const AdminDashboard = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-        localStorage.removeItem('userRole');
         navigate('/login');
     };
 
     const handleStatusUpdate = (complaintId, newStatus) => {
-        // Optimistically update the main complaints array
         const updatedComplaints = complaints.map(complaint =>
             complaint._id === complaintId
                 ? { ...complaint, status: newStatus }
                 : complaint
         );
-        setComplaints(updatedComplaints); // Update the main complaints state
-        
-        // Re-filter the complaints based on the new state for the current view
-        // Pass the *updated* array to ensure filtering is accurate immediately
+        setComplaints(updatedComplaints);
         filterComplaints(currentView, updatedComplaints); 
     };
 
@@ -264,6 +255,8 @@ const AdminDashboard = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setAdminName(data.username || 'Admin');
+                    setAdminDepartment(data.department || 'Unknown');
+                    console.log(`Admin ${data.username} logged in for department: ${data.department}`);
                 } else {
                     console.error('Failed to fetch admin profile:', await response.json());
                 }
@@ -274,27 +267,22 @@ const AdminDashboard = () => {
 
         const fetchAllComplaints = async () => {
             try {
-                // Try the admin endpoint first, fallback to regular endpoint if needed
-                let response = await fetch('http://localhost:4000/api/complaints/admin/all', {
+                const response = await fetch('http://localhost:4000/api/complaints/admin/all', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
-                // If admin endpoint doesn't exist, try the regular complaints endpoint
-                if (!response.ok && response.status === 404) {
-                    response = await fetch('http://localhost:4000/api/complaints/me', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                }
-
                 if (response.ok) {
                     const data = await response.json();
-                    setComplaints(data.data || data); // Store all complaints
-                    // Initial filter when complaints are first fetched
+                    setComplaints(data.data || data);
                     filterComplaints(currentView, data.data || data); 
+                    console.log(`Loaded ${data.count || 0} complaints for ${data.adminDepartment || 'unknown'} department`);
+                    
+                    // Set department name from API response if we have it
+                    if (data.adminDepartment) {
+                        setAdminDepartment(data.adminDepartment);
+                    }
                 } else {
                     const errorData = await response.json();
                     setError(errorData.message || 'Failed to fetch complaints.');
@@ -322,15 +310,15 @@ const AdminDashboard = () => {
 
         switch (currentView) {
             case 'dashboard':
-                return <DashboardOverview complaints={complaints} />;
+                return <DashboardOverview complaints={complaints} adminDepartment={adminDepartment} />;
             case 'analytics':
-                return <Analytics complaints={complaints} />;
+                return <Analytics complaints={complaints} adminDepartment={adminDepartment} />;
             case 'new':
             case 'in-progress':
             case 'resolved':
-                return <ComplaintsTable complaints={filteredComplaints} onStatusUpdate={handleStatusUpdate} />;
+                return <ComplaintsTable complaints={filteredComplaints} onStatusUpdate={handleStatusUpdate} adminDepartment={adminDepartment} />;
             default:
-                return <ComplaintsTable complaints={complaints} onStatusUpdate={handleStatusUpdate} />;
+                return <ComplaintsTable complaints={complaints} onStatusUpdate={handleStatusUpdate} adminDepartment={adminDepartment} />;
         }
     };
 
@@ -338,7 +326,7 @@ const AdminDashboard = () => {
         <div className="admin-dashboard-container">
             <nav className="admin-sidebar">
                 <div className="sidebar-header">
-                    <div className="bics-logo">BICS</div>
+                    <div className="bics-logo">{adminDepartment || 'ADMIN'}</div>
                 </div>
                 <ul className="admin-sidebar-links">
                     <li>
@@ -391,11 +379,11 @@ const AdminDashboard = () => {
 
             <main className="admin-main-content">
                 <header className="admin-header">
-                    <div className="header-title">SYSTEM NAME</div>
+                    <div className="header-title">{adminDepartment} COMPLAINT MANAGEMENT</div>
                     <div className="admin-profile" onClick={() => setShowProfileDropdown(!showProfileDropdown)}>
                         <div className="admin-info">
                             <span className="admin-name">{adminName}</span>
-                            <span className="admin-role">BICS Department Admin</span>
+                            <span className="admin-role">{adminDepartment} Department Admin</span>
                         </div>
                         <span className="dropdown-arrow">▼</span>
                         
