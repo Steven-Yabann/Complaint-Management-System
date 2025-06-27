@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styling/adminDash.css';
 
-const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
+const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment, searchTerm, onSearchChange }) => {
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'open': return 'status-open';
@@ -13,6 +13,13 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
             default: return 'status-open';
         }
     };
+
+    // Filter complaints based on search term
+    const filteredComplaints = complaints.filter(complaint =>
+        complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.user?.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleStatusChange = async (complaintId, newStatus) => {
         try {
@@ -48,6 +55,28 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
             <div className="complaints-header">
                 <h1>Complaints - {adminDepartment} Department</h1>
                 <p className="department-subtitle">Managing complaints for the {adminDepartment} department</p>
+                
+                {/* Search/Filter Section */}
+                <div className="complaints-search-section">
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Search by title, submitter, or description..."
+                            value={searchTerm}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                            className="search-input"
+                        />
+                        <span className="search-icon">🔍</span>
+                    </div>
+                    <div className="search-results-info">
+                        {searchTerm && (
+                            <span className="search-results-text">
+                                Showing {filteredComplaints.length} of {complaints.length} complaints
+                                {searchTerm && ` for "${searchTerm}"`}
+                            </span>
+                        )}
+                    </div>
+                </div>
             </div>
             <div className="complaints-table">
                 <div className="table-header">
@@ -57,15 +86,38 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
                     <div className="header-cell">DATE</div>
                     <div className="header-cell">ACTIONS</div>
                 </div>
-                {complaints.length === 0 ? (
+                {filteredComplaints.length === 0 ? (
                     <div className="no-complaints">
-                        No complaints to display for {adminDepartment} department
+                        {searchTerm ? (
+                            <>
+                                No complaints found matching "{searchTerm}" in {adminDepartment} department
+                                <br />
+                                <button 
+                                    onClick={() => onSearchChange('')}
+                                    className="clear-search-btn"
+                                >
+                                    Clear Search
+                                </button>
+                            </>
+                        ) : (
+                            `No complaints to display for ${adminDepartment} department`
+                        )}
                     </div>
                 ) : (
-                    complaints.map(complaint => (
+                    filteredComplaints.map(complaint => (
                         <div key={complaint._id} className="table-row">
                             <div className="table-cell complaint-title">
-                                {complaint.title}
+                                {/* Highlight search term in title */}
+                                {searchTerm ? (
+                                    <span dangerouslySetInnerHTML={{
+                                        __html: complaint.title.replace(
+                                            new RegExp(`(${searchTerm})`, 'gi'),
+                                            '<mark>$1</mark>'
+                                        )
+                                    }} />
+                                ) : (
+                                    complaint.title
+                                )}
                             </div>
                             <div className="table-cell">
                                 <span className={`status-badge ${getStatusColor(complaint.status)}`}>
@@ -73,7 +125,17 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment }) => {
                                 </span>
                             </div>
                             <div className="table-cell">
-                                {complaint.user?.username || 'Unknown'} 
+                                {/* Highlight search term in username */}
+                                {searchTerm && complaint.user?.username ? (
+                                    <span dangerouslySetInnerHTML={{
+                                        __html: complaint.user.username.replace(
+                                            new RegExp(`(${searchTerm})`, 'gi'),
+                                            '<mark>$1</mark>'
+                                        )
+                                    }} />
+                                ) : (
+                                    complaint.user?.username || 'Unknown'
+                                )}
                             </div>
                             <div className="table-cell">
                                 {new Date(complaint.createdAt).toLocaleDateString()}
@@ -201,6 +263,7 @@ const AdminDashboard = () => {
     const [adminName, setAdminName] = useState('Admin');
     const [adminDepartment, setAdminDepartment] = useState('');
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(''); // New state for search
 
     const currentView = location.pathname.split('/').pop() || 'dashboard';
 
@@ -208,6 +271,10 @@ const AdminDashboard = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         navigate('/login');
+    };
+
+    const handleSearchChange = (term) => {
+        setSearchTerm(term);
     };
 
     const handleStatusUpdate = (complaintId, newStatus) => {
@@ -302,7 +369,9 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         filterComplaints(currentView);
-    }, [currentView, complaints]); 
+        // Clear search term when changing views
+        setSearchTerm('');
+    }, [currentView, complaints]);
 
     const renderMainContent = () => {
         if (loading) return <div className="loading">Loading dashboard...</div>;
@@ -316,9 +385,25 @@ const AdminDashboard = () => {
             case 'new':
             case 'in-progress':
             case 'resolved':
-                return <ComplaintsTable complaints={filteredComplaints} onStatusUpdate={handleStatusUpdate} adminDepartment={adminDepartment} />;
+                return (
+                    <ComplaintsTable 
+                        complaints={filteredComplaints} 
+                        onStatusUpdate={handleStatusUpdate} 
+                        adminDepartment={adminDepartment}
+                        searchTerm={searchTerm}
+                        onSearchChange={handleSearchChange}
+                    />
+                );
             default:
-                return <ComplaintsTable complaints={complaints} onStatusUpdate={handleStatusUpdate} adminDepartment={adminDepartment} />;
+                return (
+                    <ComplaintsTable 
+                        complaints={complaints} 
+                        onStatusUpdate={handleStatusUpdate} 
+                        adminDepartment={adminDepartment}
+                        searchTerm={searchTerm}
+                        onSearchChange={handleSearchChange}
+                    />
+                );
         }
     };
 

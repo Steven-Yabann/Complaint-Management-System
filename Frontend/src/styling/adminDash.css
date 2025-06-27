@@ -419,3 +419,294 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Additional CSS for AdminDashboard.css - Department-specific styling */
+
+/* Department subtitle styling */
+.department-subtitle {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    font-style: italic;
+    text-align: center;
+}
+
+.complaints-header .department-subtitle {
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+/* No department complaints message */
+.no-department-complaints {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-department-complaints p {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* Enhanced sidebar logo to show department */
+.bics-logo {
+    background-color: #6c757d;
+    color: white;
+    padding: 12px 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    text-align: center;
+    word-break: break-word; /* Handle long department names */
+}
+
+/* Enhanced admin role display */
+.admin-role {
+    font-size: 0.75em;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* Enhanced header title for department */
+.header-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #343a40;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Enhanced unseen notification for department context */
+.unseen-notification {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Responsive adjustments for department names */
+@media (max-width: 768px) {
+    .bics-logo {
+        font-size: 1em;
+        padding: 10px 12px;
+    }
+    
+    .header-title {
+        font-size: 1em;
+    }
+    
+    .admin-role {
+        font-size: 0.7em;
+        max-width: 150px;
+    }
+    
+    .department-subtitle {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .bics-logo {
+        font-size: 0.9em;
+        padding: 8px 10px;
+        letter-spacing: 0.5px;
+    }
+    
+    .header-title {
+        font-size: 0.9em;
+        max-width: 200px;
+    }
+    
+    .complaints-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .no-department-complaints {
+        padding: 20px;
+    }
+    
+    .no-department-complaints p {
+        font-size: 1em;
+    }
+}
+
+/* Department subtitle styling */
+.department-subtitle {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    font-style: italic;
+    text-align: center;
+}
+
+.complaints-header .department-subtitle {
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+/* No department complaints message */
+.no-department-complaints {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-department-complaints p {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* Add these styles to Frontend/src/styling/adminDash.css */
+
+/* Search Section Styling */
+.complaints-search-section {
+    margin: 20px 0;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+}
+
+.search-container {
+    position: relative;
+    max-width: 500px;
+    margin-bottom: 10px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.2em;
+    pointer-events: none;
+}
+
+.search-results-info {
+    margin-top: 8px;
+}
+
+.search-results-text {
+    color: #6c757d;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+/* Clear search button */
+.clear-search-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Highlight search results */
+mark {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Enhanced no complaints message */
+.no-complaints {
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-container {
+        max-width: 100%;
+    }
+    
+    .search-input {
+        padding: 10px 40px 10px 12px;
+        font-size: 0.9em;
+    }
+    
+    .search-icon {
+        right: 12px;
+        font-size: 1.1em;
+    }
+    
+    .search-results-text {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .complaints-search-section {
+        margin: 15px 0;
+        padding-bottom: 15px;
+    }
+    
+    .search-input {
+        padding: 8px 35px 8px 10px;
+        font-size: 0.85em;
+    }
+    
+    .search-icon {
+        right: 10px;
+        font-size: 1em;
+    }
+    
+    .clear-search-btn {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+}
