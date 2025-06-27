@@ -12,6 +12,7 @@ import AdminDashboard from './pages/adminDash';
 import AdminProfilePage from './pages/adminProfilePage';
 import ProtectedRoute from './components/protectedRoutes';
 import ComplaintDetails from './pages/complaintDetails';
+import NotificationPage from './pages/notificationPage';
 
 function App() {
     return (
@@ -62,6 +63,15 @@ function App() {
                             <ProfilePage />
                         </ProtectedRoute>
                     } 
+                />
+                
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <NotificationPage />
+                        </ProtectedRoute>
+                    }
                 />
 
                 {/* Admin routes - require admin role */}

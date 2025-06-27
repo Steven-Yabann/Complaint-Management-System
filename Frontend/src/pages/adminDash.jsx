@@ -19,22 +19,35 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
     const handleStatusChange = async (complaintId, newStatus) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:4000/api/complaints/${complaintId}/status`, {
-                method: 'PUT',
+            if (!token) {
+                console.error('No token found. User not authenticated.');
+                // Optionally redirect or show an error to the user
+                return;
+            }
+
+            // *** THE CRITICAL CHANGE IS HERE: Remove '/status' from the URL ***
+            const response = await fetch(`http://localhost:4000/api/complaints/${complaintId}`, {
+                method: 'PUT', // Method remains PUT
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify({ status: newStatus }) // Send the status in the request body
             });
 
             if (response.ok) {
+                // If the backend call is successful, update the parent component's state
+                // This will re-render the table with the new status
                 onStatusUpdate(complaintId, newStatus);
+                console.log(`Complaint ${complaintId} status updated to ${newStatus}`);
             } else {
-                console.error('Failed to update complaint status');
+                const errorData = await response.json();
+                console.error('Failed to update complaint status:', errorData.message || 'Unknown error');
+                // You might want to display this error to the admin user in the UI
             }
         } catch (error) {
             console.error('Error updating complaint status:', error);
+            // Handle network errors
         }
     };
 
@@ -69,7 +82,8 @@ const ComplaintsTable = ({ complaints, onStatusUpdate }) => {
                                 </span>
                             </div>
                             <div className="table-cell">
-                                {complaint.user?.username || complaint.submittedBy?.username || 'Unknown'}
+                                {/* Ensure complaint.user is populated and has username */}
+                                {complaint.user?.username || 'Unknown'} 
                             </div>
                             <div className="table-cell">
                                 {new Date(complaint.createdAt).toLocaleDateString()}
@@ -106,7 +120,7 @@ const DashboardOverview = ({ complaints }) => {
     const open = complaints.filter(c => c.status === 'Open').length;
     const inProgress = complaints.filter(c => c.status === 'In Progress').length;
     const resolved = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
-    const unseenCount = complaints.filter(c => !c.seen).length;
+    const unseenCount = complaints.filter(c => !c.seen).length; // Check if this `seen` property actually exists and is updated
 
     return (
         <div className="dashboard-overview">
@@ -148,8 +162,8 @@ const Analytics = ({ complaints }) => {
                    complaintDate.getFullYear() === now.getFullYear();
         }).length;
 
-        const avgResolutionTime = "5.2 days"; // This would be calculated from actual data
-        const satisfactionRate = "87%"; // This would come from user feedback
+        const avgResolutionTime = "5.2 days"; 
+        const satisfactionRate = "87%"; 
 
         return { total, thisMonth, avgResolutionTime, satisfactionRate };
     };
@@ -202,18 +216,17 @@ const AdminDashboard = () => {
     };
 
     const handleStatusUpdate = (complaintId, newStatus) => {
-        setComplaints(prev => 
-            prev.map(complaint => 
-                complaint._id === complaintId 
-                    ? { ...complaint, status: newStatus }
-                    : complaint
-            )
-        );
-        filterComplaints(currentView, complaints.map(complaint => 
-            complaint._id === complaintId 
+        // Optimistically update the main complaints array
+        const updatedComplaints = complaints.map(complaint =>
+            complaint._id === complaintId
                 ? { ...complaint, status: newStatus }
                 : complaint
-        ));
+        );
+        setComplaints(updatedComplaints); // Update the main complaints state
+        
+        // Re-filter the complaints based on the new state for the current view
+        // Pass the *updated* array to ensure filtering is accurate immediately
+        filterComplaints(currentView, updatedComplaints); 
     };
 
     const filterComplaints = (view, complaintsArray = complaints) => {
@@ -251,6 +264,8 @@ const AdminDashboard = () => {
                 if (response.ok) {
                     const data = await response.json();
                     setAdminName(data.username || 'Admin');
+                } else {
+                    console.error('Failed to fetch admin profile:', await response.json());
                 }
             } catch (err) {
                 console.error('Error fetching admin profile:', err);
@@ -277,11 +292,13 @@ const AdminDashboard = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setComplaints(data.data || data);
-                    setFilteredComplaints(data.data || data);
+                    setComplaints(data.data || data); // Store all complaints
+                    // Initial filter when complaints are first fetched
+                    filterComplaints(currentView, data.data || data); 
                 } else {
                     const errorData = await response.json();
                     setError(errorData.message || 'Failed to fetch complaints.');
+                    console.error('Failed to fetch complaints:', errorData);
                 }
             } catch (err) {
                 setError('Network error: Could not connect to the server.');
@@ -293,11 +310,11 @@ const AdminDashboard = () => {
 
         fetchAdminProfile();
         fetchAllComplaints();
-    }, [navigate]);
+    }, [navigate]); 
 
     useEffect(() => {
         filterComplaints(currentView);
-    }, [currentView, complaints]);
+    }, [currentView, complaints]); 
 
     const renderMainContent = () => {
         if (loading) return <div className="loading">Loading dashboard...</div>;
@@ -308,8 +325,12 @@ const AdminDashboard = () => {
                 return <DashboardOverview complaints={complaints} />;
             case 'analytics':
                 return <Analytics complaints={complaints} />;
-            default:
+            case 'new':
+            case 'in-progress':
+            case 'resolved':
                 return <ComplaintsTable complaints={filteredComplaints} onStatusUpdate={handleStatusUpdate} />;
+            default:
+                return <ComplaintsTable complaints={complaints} onStatusUpdate={handleStatusUpdate} />;
         }
     };
 

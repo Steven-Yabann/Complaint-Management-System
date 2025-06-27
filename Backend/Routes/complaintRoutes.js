@@ -1,4 +1,4 @@
-// Add these routes to your Backend/Routes/complaint_router.js
+// backend/Routes/complaintRoutes.js
 
 const express = require('express');
 const { 
@@ -18,12 +18,12 @@ router.route('/').post(protect, createComplaint);
 router.route('/me').get(protect, getUserComplaints);
 
 // Admin routes - get all complaints
-router.route('/admin/all').get(protect, authorize('admin'), getAllComplaints);
+// router.route('/admin/all').get(protect, authorize('admin'), getAllComplaints);
 
 // Admin routes - update complaint status
-router.route('/:id/status').put(protect, authorize('admin'), updateComplaintStatus);
+// router.route('/:id/status').put(protect, authorize('admin'), updateComplaintStatus);
 
-// Routes for specific complaints
+// --- Routes for specific complaints by ID (common for both users and admins) ---
 router.route('/:id')
     .get(protect, getComplaint)
     .put(protect, updateComplaint)

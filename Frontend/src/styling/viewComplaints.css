@@ -1,88 +1,129 @@
-/* frontend/src/styling/ComplaintStatusPage.css */
+/* frontend/src/styling/viewComplaints.css */
 
+/*
+* This CSS file styles the content specific to the ViewComplaints page.
+* The overall page layout (sidebar + main content) is handled by `userDash.css`.
+*/
+
+/*
+* Removed the direct .complaint-status-container styling that controlled overall page layout,
+* as .user-dashboard-container from userDash.css now handles the main flex layout.
+* The `.complaints-table-wrapper` now uses `.dashboard-widget` for consistency.
+*/
+/*
 .complaint-status-container {
+    display: flex;
+    flex-direction: column;
     padding: 20px;
-    max-width: 1200px;
-    margin: 20px auto;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #f4f7f6;
+    min-height: 100vh;
 }
+*/
 
-.complaint-status-container h1 {
-    text-align: center;
+/* Styles for the main heading (e.g., "My Complaints") */
+.dashboard-main-content h1 { /* Targeting h1 inside main content for consistency */
+    font-size: 2.5em;
     color: #333;
-    margin-bottom: 25px;
-    font-size: 2em;
+    margin-bottom: 30px; /* Space below the main heading */
+    text-align: left; /* Align to left within the main content area */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0; /* Subtle separator */
 }
 
+/* Style for the message when no complaints are filed */
+.no-complaints-message {
+    font-size: 1.2em;
+    color: #555;
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.no-complaints-message a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.no-complaints-message a:hover {
+    text-decoration: underline;
+}
+
+/* Complaints Table Styling */
 .complaints-table-wrapper {
-    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    overflow-x: auto; /* Allows horizontal scrolling on small screens if table is too wide */
+    margin-top: 20px;
+    /* The .dashboard-widget class (from userDash.css) provides:
+       background-color: white;
+       padding: 25px;
+       border-radius: 8px;
+       box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
+       transition: transform 0.2s ease-in-out;
+       display: flex;
+       flex-direction: column;
+    */
+    display: block; /* Override flex-direction: column from dashboard-widget for table wrapper */
 }
 
 .complaints-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 0.9em;
-    min-width: 600px; /* Ensures table doesn't get too squished */
+    border-collapse: collapse; /* Removes spacing between table cells */
+    min-width: 700px; /* Ensures table is readable on smaller screens by enforcing minimum width */
 }
 
 .complaints-table th,
 .complaints-table td {
     padding: 12px 15px;
-    border: 1px solid #ddd;
     text-align: left;
+    border-bottom: 1px solid #ddd; /* Light separator for rows */
 }
 
 .complaints-table th {
-    background-color: #007bff; /* Primary blue from your other elements */
-    color: white;
+    background-color: #ecf0f1; /* Light header background */
+    color: #2c3e50; /* Darker text for headers */
     font-weight: bold;
     text-transform: uppercase;
-}
-
-.complaints-table tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+    font-size: 0.9em;
 }
 
 .complaints-table tbody tr:hover {
-    background-color: #e9e9e9;
+    background-color: #f5f5f5; /* Subtle hover effect on rows */
 }
 
-/* Status Pills Styling */
+/* Status Pills */
 .status-pill {
     display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 20px; /* Fully rounded pill shape */
     font-size: 0.85em;
-    text-transform: capitalize;
-    color: white; /* Default text color for pills */
+    font-weight: bold;
+    color: white;
     text-align: center;
-    min-width: 80px;
+    min-width: 90px; /* Ensure consistent width for pills */
 }
 
 .status-open, .status-unresolved {
-    background-color: #dc3545; /* Red */
+    background-color: #e74c3c; /* Red */
 }
 
 .status-in-progress {
-    background-color: #ffc107; /* Orange (warning) */
-    color: #333; /* Darker text for better contrast on orange */
+    background-color: #f39c12; /* Orange */
 }
 
 .status-resolved {
-    background-color: #28a745; /* Green (success) */
+    background-color: #27ae60; /* Green */
 }
 
 .status-default {
-    background-color: #6c757d; /* Gray */
+    background-color: #7f8c8d; /* Grey */
 }
 
-/* Actions Cell Styling */
+/* Actions Cell */
 .actions-cell {
-    white-space: nowrap; /* Prevents buttons from wrapping */
+    white-space: nowrap; /* Prevent buttons from wrapping */
 }
 
 .action-btn {
@@ -90,68 +131,194 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 0.85em;
-    margin-right: 5px;
-    transition: background-color 0.2s ease;
+    font-size: 0.9em;
+    margin-right: 8px; /* Space between buttons */
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.action-btn:last-child {
-    margin-right: 0;
-}
-
-.edit-btn {
-    background-color: #007bff; /* Blue */
+.action-btn.edit-btn {
+    background-color: #3498db; /* Blue */
     color: white;
 }
 
-.edit-btn:hover {
-    background-color: #0056b3;
+.action-btn.edit-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
 }
 
-.delete-btn {
-    background-color: #dc3545; /* Red */
+.action-btn.delete-btn {
+    background-color: #e74c3c; /* Red */
     color: white;
 }
 
-.delete-btn:hover {
-    background-color: #c82333;
+.action-btn.delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
 }
 
-/* Responsive adjustments */
+/* Custom Confirmation Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of other content */
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 90%;
+    max-width: 450px; /* Max width for larger screens */
+    box-sizing: border-box;
+    position: relative; /* For potential close button positioning */
+}
+
+.modal-content h3 {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Space between buttons */
+}
+
+.btn-cancel,
+.btn-confirm {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 100px; /* Ensure buttons have a minimum size */
+}
+
+.btn-cancel {
+    background-color: #95a5a6; /* Grey for cancel */
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #7f8c8d;
+    transform: translateY(-1px);
+}
+
+.btn-confirm {
+    background-color: #e74c3c; /* Red for confirm deletion */
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+}
+
+/* Responsive Adjustments for Table and Modal */
 @media (max-width: 768px) {
-    .complaint-status-container {
-        margin: 10px;
-        padding: 15px;
+    .dashboard-main-content h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+
+    .complaints-table {
+        min-width: 600px; /* Adjust min-width for tablets */
     }
 
     .complaints-table th,
     .complaints-table td {
-        padding: 8px 10px;
-        font-size: 0.8em;
+        padding: 10px;
+        font-size: 0.9em;
     }
+
+    .status-pill {
+        padding: 5px 10px;
+        font-size: 0.8em;
+        min-width: 75px;
+    }
+
     .action-btn {
         padding: 6px 10px;
-        font-size: 0.75em;
+        font-size: 0.8em;
+        margin-right: 5px;
     }
 }
 
+@media (max-width: 480px) {
+    .dashboard-main-content h1 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        text-align: center; /* Center heading on very small screens */
+    }
+    
+    .complaints-table {
+        min-width: 100%; /* Allow table to shrink on very small screens, rely on overflow-x */
+    }
 
-.dashboard-link-container {
-    text-align: right; /* Aligns the button to the right */
-    margin-bottom: 20px; /* Adds some space below the button */
+    .complaints-table th,
+    .complaints-table td {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+
+    .status-pill {
+        padding: 4px 8px;
+        font-size: 0.75em;
+        min-width: 60px;
+    }
+
+    .action-btn {
+        display: block; /* Stack buttons vertically */
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 5px;
+        padding: 8px;
+    }
+
+    .actions-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px; /* Space between stacked buttons */
+    }
+
+    /* Modal for smaller screens */
+    .modal-content {
+        padding: 20px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .modal-content p {
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        padding: 10px 20px;
+        font-size: 0.9em;
+        min-width: 80px;
+    }
 }
-
-.dashboard-link {
-    display: inline-block; /* Allows padding and margin to apply */
-    padding: 10px 15px;
-    background-color: #007bff; /* A nice blue color */
-    color: white;
-    text-decoration: none; /* Removes underline */
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.dashboard-link:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-}
-

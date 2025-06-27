@@ -1,0 +1,474 @@
+/* frontend/src/styling/notification.css */
+
+/* Notifications Page Styling */
+
+/* Main container for the notifications list, complements dashboard-widget */
+.notifications-list-container {
+    /* Inherits general card/widget styles (background, shadow, padding) from userDash.css via .dashboard-widget */
+    width: 100%;
+    max-width: 800px; /* Max width for readability on larger screens */
+    margin: 20px auto; /* Centers the container horizontally */
+    /* Padding is often defined by .dashboard-widget, but can be overridden here if needed */
+}
+
+/* Heading for the notifications list */
+.notifications-list-container h2 {
+    font-size: 1.8em;
+    color: #34495e; /* Dark blue-grey, consistent with dashboard headings */
+    margin-top: 0;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #ecf0f1; /* Subtle light grey border */
+    text-align: center;
+}
+
+/* Unordered list for notifications */
+.notifications-list {
+    list-style: none; /* Removes default bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual notification item styling */
+.notification-item {
+    background-color: #f9f9f9; /* Light grey background for read notifications */
+    border: 1px solid #e0e0e0; /* Light grey border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px;
+    margin-bottom: 15px; /* Space between notification items */
+    display: flex; /* Uses flexbox for layout within the item */
+    justify-content: space-between; /* Pushes content and actions to opposite ends */
+    align-items: flex-start; /* Aligns content and actions to the top */
+    gap: 15px; /* Space between content and actions */
+    cursor: pointer; /* Indicates clickable item */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effects */
+    position: relative; /* Needed for positioning the NEW badge if used */
+}
+
+.notification-item:hover {
+    background-color: #f0f0f0; /* Slightly darker background on hover */
+    
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Adds shadow on hover */
+}
+
+/* Specific styling for unread notifications */
+.notification-item.unread {
+    background-color: #eaf3fa; /* Light blue background for unread */
+    border-color: #a7d9f7; /* Stronger blue border */
+    font-weight: bold; /* Bold text for unread */
+}
+
+.notification-item.unread:hover {
+    background-color: #dbeaf5; /* Slightly darker blue on hover for unread */
+}
+
+/* Specific styling for notifications where feedback has been given */
+.notification-item.feedback-done {
+    opacity: 0.8; /* Slightly fade out */
+    background-color: #e6ffe6; /* Light green background */
+    border-color: #c9f7c9; /* Green border */
+}
+
+.notification-content {
+    flex-grow: 1; /* Allows content to take up available space */
+    display: flex;
+    flex-direction: column; /* Stacks message and date vertically */
+}
+
+.notification-message {
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.notification-date {
+    font-size: 0.85em;
+    color: #777;
+}
+
+.notification-actions {
+    display: flex;
+    flex-direction: column; /* Stacks badges/buttons vertically */
+    align-items: flex-end; /* Aligns actions to the right */
+    gap: 10px; /* Space between action items */
+    flex-shrink: 0; /* Prevents actions from shrinking */
+}
+
+/* Styling for the "NEW" badge on unread notifications */
+.new-badge {
+    background-color: #e74c3c; /* Red color */
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Styling for the "Feedback Given!" badge */
+.feedback-done-badge {
+    background-color: #27ae60; /* Green color */
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Styling for the "Provide Feedback" button */
+.feedback-btn {
+    background-color: #f39c12; /* Orange color */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap; /* Prevents button text from wrapping */
+}
+
+.feedback-btn:hover {
+    background-color: #e67e22; /* Darker orange on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+/* Message for when there are no notifications */
+.no-notifications-message {
+    font-size: 1.2em;
+    color: #555;
+    text-align: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.no-notifications-message a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.no-notifications-message a:hover {
+    text-decoration: underline;
+}
+
+/* General Layout for Navbar Notification Badge (copied from userDash.css as a reminder) */
+/* This is primarily for the badge in UserNavbar.jsx */
+.notification-link {
+    position: relative; /* Needed for positioning the badge */
+    display: flex; /* Allows content (text + badge) to align */
+    align-items: center; /* Centers vertically */
+    gap: 5px; /* Space between text and badge */
+}
+
+.notification-badge {
+    background-color: #e74c3c; /* Red color for the badge */
+    color: white;
+    border-radius: 50%; /* Makes it round */
+    padding: 4px 8px; /* Adjust padding to control size */
+    font-size: 0.7em;
+    font-weight: bold;
+    position: absolute; /* Position over the link */
+    top: -5px; /* Adjust as needed to position relative to link text */
+    right: -10px; /* Adjust as needed */
+    min-width: 20px; /* Ensures minimum size for single-digit numbers */
+    text-align: center;
+    line-height: 1; /* For vertical centering of text */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+
+/* --- Feedback Modal Styling (used by FeedbackModal.jsx) --- */
+
+/* Overlay that covers the whole screen when modal is open */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center; /* Centers modal horizontally */
+    align-items: center; /* Centers modal vertically */
+    z-index: 1000; /* Ensure it's on top of other content */
+}
+
+/* Content box of the modal */
+.modal-content.feedback-modal {
+    background-color: white;
+    padding: 35px;
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow for pop-out effect */
+    text-align: center;
+    width: 90%;
+    max-width: 550px; /* Max width for larger screens */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column; /* Stacks modal content vertically */
+    gap: 20px; /* Space between modal elements */
+    animation: fadeInScale 0.3s ease-out forwards; /* Entry animation */
+}
+
+/* Keyframe animation for modal entry */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.feedback-modal h3 {
+    color: #2c3e50; /* Dark heading color */
+    font-size: 1.8em;
+    margin-bottom: 5px; /* Space to the subtitle */
+}
+
+.feedback-modal h4 {
+    color: #555;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    font-weight: normal; /* Less bold than main heading */
+}
+
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between form groups */
+}
+
+.feedback-form .form-group {
+    text-align: left;
+}
+
+.feedback-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #34495e;
+    font-size: 1em;
+}
+
+.feedback-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+    resize: vertical; /* Allows user to resize textarea vertically */
+    min-height: 80px; /* Minimum height for textarea */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedback-form textarea:focus {
+    border-color: #2980b9; /* Highlight on focus */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2);
+}
+
+.rating-group .stars {
+    display: flex;
+    justify-content: center; /* Centers stars horizontally */
+    gap: 5px; /* Space between stars */
+    margin-top: 10px;
+}
+
+.rating-group .star {
+    font-size: 2.5em; /* Large star icons */
+    color: #ccc; /* Default (unfilled) star color */
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.rating-group .star.filled {
+    color: #f1c40f; /* Filled star color (gold) */
+}
+
+.rating-group .star:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+/* Ensure hover works even if already filled for consistent feedback */
+.rating-group .star:hover,
+.rating-group .star.filled:hover {
+    color: #f39c12; /* Slightly darker gold on hover */
+}
+
+
+.modal-actions {
+    display: flex;
+    justify-content: center; /* Centers action buttons */
+    gap: 15px; /* Space between buttons */
+    margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-confirm {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 120px; /* Ensures consistent button width */
+    font-weight: bold;
+}
+
+.btn-cancel {
+    background-color: #95a5a6; /* Grey for cancel */
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #7f8c8d;
+    transform: translateY(-1px);
+}
+
+.btn-confirm {
+    background-color: #27ae60; /* Green for confirm/submit */
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #229954;
+    transform: translateY(-1px);
+}
+
+.btn-confirm:disabled,
+.btn-cancel:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none; /* No hover effect when disabled */
+}
+
+
+/* General message styling for forms/modals */
+.form-message {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.95em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.form-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* Responsive Adjustments */
+
+@media (max-width: 768px) {
+    .notifications-list-container {
+        padding: 20px;
+    }
+    .notification-item {
+        flex-direction: column; /* Stack content and actions vertically */
+        align-items: flex-start;
+        padding: 15px;
+    }
+    .notification-actions {
+        flex-direction: row; /* Keep actions in a row on smaller screens for better use of space */
+        width: 100%; /* Take full width */
+        justify-content: flex-end; /* Align actions to the right */
+        margin-top: 10px; /* Space from content */
+    }
+    .feedback-btn, .new-badge, .feedback-done-badge {
+        font-size: 0.8em;
+        padding: 6px 10px;
+    }
+    .notification-message {
+        font-size: 1em;
+    }
+
+    /* Modal for smaller screens */
+    .modal-content.feedback-modal {
+        padding: 25px;
+        max-width: 95%; /* Allow it to take more width */
+    }
+    .feedback-modal h3 {
+        font-size: 1.5em;
+    }
+    .feedback-modal h4 {
+        font-size: 1.1em;
+    }
+    .rating-group .star {
+        font-size: 2em; /* Smaller stars */
+    }
+    .btn-cancel, .btn-confirm {
+        padding: 10px 20px;
+        font-size: 0.9em;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notifications-list-container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    .notification-item {
+        padding: 12px;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+    .notification-message {
+        font-size: 0.95em;
+    }
+    .notification-date {
+        font-size: 0.8em;
+    }
+    .feedback-btn, .new-badge, .feedback-done-badge {
+        font-size: 0.75em;
+        padding: 5px 8px;
+    }
+    .notification-actions {
+        justify-content: space-between; /* Distribute actions on smallest screens */
+    }
+
+    /* Modal for smallest screens */
+    .modal-content.feedback-modal {
+        padding: 20px;
+        gap: 15px;
+    }
+    .feedback-modal h3 {
+        font-size: 1.3em;
+    }
+    .feedback-modal h4 {
+        font-size: 1em;
+    }
+    .rating-group .star {
+        font-size: 1.8em; /* Even smaller stars */
+    }
+    .btn-cancel, .btn-confirm {
+        padding: 8px 15px;
+        font-size: 0.85em;
+        min-width: 80px;
+        margin-top: 10px;
+    }
+    .modal-actions {
+        flex-direction: column; /* Stack buttons vertically in modal */
+        gap: 10px;
+    }
+}

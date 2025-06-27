@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import '../styling/login.css';
-import loginImg from '../assets/login.avif';
+import '../styling/login.css'; // This will contain the updated styles
+import loginImg from '../assets/stc.jpg';
 import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = () => {
@@ -29,7 +29,6 @@ const LoginPage = () => {
             [name]: ''
         });
     };
-
 
     const validateLogin = () => {
         let valid = true;
@@ -119,50 +118,53 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="auth-container login-view">
-            <div className="image-panel">
-                <img src={loginImg} alt="Login" />
-            </div>
+        // Added a new wrapper div specifically for centering the login page
+        <div className="login-page-wrapper">
+            <div className="auth-container login-view">
+                <div className="image-panel">
+                    <img src={loginImg} alt="Login" />
+                </div>
 
-            <div className="form-panel">
-                <Link to="/" className="back-home-btn">Home</Link>
-                <form className="login-form" onSubmit={handleSubmit}>
-                    <h1>Welcome Back</h1>
-                    {loginMessage && <div className={`message ${loginMessage.includes('successful') ? 'success' : 'error'}`}>{loginMessage}</div>}
-                    <div className="input-group">
-                        <span>👤</span>
-                        <input
-                            type="text"
-                            name="username"
-                            placeholder="Username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            autoComplete="username"
-                        />
-                    </div>
-                    {errors.username && <span className="error-message">{errors.username}</span>}
+                <div className="form-panel">
+                    <Link to="/" className="back-home-btn">Home</Link>
+                    <form className="login-form" onSubmit={handleSubmit}>
+                        <h1>Welcome Back</h1>
+                        {loginMessage && <div className={`message ${loginMessage.includes('successful') ? 'success' : 'error'}`}>{loginMessage}</div>}
+                        <div className="input-group">
+                            <span>👤</span>
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="Username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                autoComplete="username"
+                            />
+                        </div>
+                        {errors.username && <span className="error-message">{errors.username}</span>}
 
-                    <div className="input-group">
-                        <span>🔒</span>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            autoComplete="current-password"
-                        />
-                    </div>
-                    {errors.password && <span className="error-message">{errors.password}</span>}
+                        <div className="input-group">
+                            <span>🔒</span>
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                autoComplete="current-password"
+                            />
+                        </div>
+                        {errors.password && <span className="error-message">{errors.password}</span>}
 
-                    <button type="submit" className="primary-btn">Sign In</button>
-                    <div className="form-footer">
-                        <p>New here?</p>
-                        <Link to="/register" className="switch-btn">
-                            Create Account
-                        </Link>
-                    </div>
-                </form>
+                        <button type="submit" className="primary-btn">Sign In</button>
+                        <div className="form-footer">
+                            <p>New here?</p>
+                            <Link to="/register" className="switch-btn">
+                                Create Account
+                            </Link>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

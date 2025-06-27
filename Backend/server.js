@@ -11,6 +11,8 @@ const departmentRoutes = require('./Routes/departmentRoutes');
 const complaintRoutes = require('./Routes/complaintRoutes');
 const userRoutes = require('./Routes/userRoutes');
 const adminRoutes = require('./Routes/adminRoutes'); // Add admin routes
+const notificationRoutes = require('./Routes/notificationRoutes'); // Add notification routes
+const feedbackRoutes = require('./Routes/feedbackRoutes'); // Add feedback routes
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -29,6 +31,8 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes); 
+app.use('/api/notifications', notificationRoutes); // Add notification routes
+app.use('/api/feedback', feedbackRoutes); // Add feedback routes
 
 
 // Simple test route

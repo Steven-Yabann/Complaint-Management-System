@@ -1,15 +1,19 @@
+// backend/models/Notification.js
+
 const mongoose = require('mongoose');
 
 const NotificationSchema = new mongoose.Schema({
-    recipient: { // Reference to the User who receives the notification
+    user: { // Changed from 'recipient' to 'user' to match controller convention
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'User', // Reference to the User model
         required: true
     },
-    relatedComplaint: { // Optional: Reference to the Complaint related to the notification
+    // Changed from 'relatedComplaint' to 'complaint' for simpler reference and consistency
+    // with how it's populated and used in frontend.
+    complaint: { 
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Complaint',
-        required: false, // A notification might not always be complaint-specific
+        ref: 'Complaint', // Reference to the Complaint model
+        required: false, 
         default: null
     },
     message: {
@@ -17,7 +21,16 @@ const NotificationSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    type: { // Added 'type' field as it's used in createNotification and helps categorization
+        type: String,
+        enum: ['statusUpdate', 'feedbackReminder', 'newFeedback', 'system'], // Define types as per your application's needs
+        default: 'system'
+    },
     isRead: {
+        type: Boolean,
+        default: false
+    },
+    feedbackGiven: { // Added 'feedbackGiven' field as it's used in frontend logic
         type: Boolean,
         default: false
     },
