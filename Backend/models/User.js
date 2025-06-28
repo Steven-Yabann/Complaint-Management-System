@@ -22,7 +22,8 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: 6,
+        select: false // <<<--- RECOMMENDED: Do not return password by default on queries
     },
     role: {
         type: String,
@@ -34,7 +35,7 @@ const UserSchema = new mongoose.Schema({
         ref: 'Department',
         required: false
     },
-    // New fields for 2FA/Password Reset OTP
+    // New fields for 2FA/Password Reset OTP (already present, good!)
     otp: {
         type: String,
         default: null // Stores the OTP sent to the user
@@ -42,6 +43,11 @@ const UserSchema = new mongoose.Schema({
     otpExpires: {
         type: Date,
         default: null // Stores the expiry time for the OTP
+    },
+    // --- NEW FIELD: To track if user's email is verified ---
+    isVerified: {
+        type: Boolean,
+        default: false // New users are unverified by default
     },
     createdAt: {
         type: Date,
@@ -62,8 +68,24 @@ UserSchema.pre('save', async function(next) {
 
 // Method to compare entered password with hashed password in the database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
+    // 'this.password' will be available here because authController's login
+    // explicitly uses .select('+password')
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+// --- NEW METHOD: To generate OTP and set its expiry ---
+UserSchema.methods.generateEmailOTP = function() {
+    // Generate a 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set OTP expiry (e.g., 10 minutes from now)
+    this.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes in milliseconds
+    
+    // Store the generated OTP on the user document
+    this.otp = otp; 
 
+    return otp; // Return the plain OTP to be sent via email
+};
+
+
+module.exports = mongoose.model('User', UserSchema);

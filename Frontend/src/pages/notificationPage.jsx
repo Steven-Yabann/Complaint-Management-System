@@ -1,6 +1,6 @@
 // frontend/src/pages/NotificationPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, } from 'react-router-dom';
 import UserNavbar from '../components/userNavbar'; // Import Navbar
 import FeedbackModal from '../components/feedbackModal'; // Import the new FeedbackModal
 import '../styling/userDash.css'; // For general layout classes
