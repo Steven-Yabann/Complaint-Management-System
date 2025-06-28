@@ -1,21 +1,19 @@
 // backend/controllers/authController.js
 
 const User = require('../models/User.js');
-const bcrypt = require('bcryptjs'); // Using bcryptjs as per your User model
+const bcrypt = require('bcryptjs'); // used foor hashing passwords
 const jwt = require('jsonwebtoken');
 
 // Helper function to sign a JWT token
 const generateToken = (id, role, username) => { // Role and username are passed
     return jwt.sign(
-        { id, role, username }, // Include 'id', 'role', and 'username' in the payload
-        process.env.JWT_SECRET, // JWT_SECRET from your .env
-        { expiresIn: process.env.JWT_EXPIRE } // JWT_EXPIRE from your .env
+        { id, role, username }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: process.env.JWT_EXPIRE } 
     );
 };
 
-// @desc    Login User
-// @route   POST /api/login
-// @access  Public
+// Function to handle user login
 exports.loginUser = async (req, res) => {
     console.log("Received login data: ", req.body);
     const { username, password } = req.body; // Frontend sends 'username' and 'password'
@@ -64,11 +62,9 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-// @desc    Register User
-// @route   POST /api/register
-// @access  Public
+//for registering a new user
 exports.registerUser = async (req, res) => {
-    const { username, email, password, first_name, last_name, admissionNumber, role } = req.body; // Using 'role' to match model
+    const { username, email, password, role } = req.body; // Using 'role' to match model
 
     try {
         // Check if user exists by username or email
@@ -82,22 +78,12 @@ exports.registerUser = async (req, res) => {
             return res.status(409).json({ message: 'Email is already registered.' });
         }
 
-        if (admissionNumber) {
-            let userByAdmissionNumber = await User.findOne({ admissionNumber });
-            if (userByAdmissionNumber) {
-                return res.status(409).json({ message: 'Admission number is already registered.' });
-            }
-        }
-
         // Create a new User instance
         const newUser = new User({
             username,
             email,
-            password, // Mongoose pre-save hook will hash this
-            first_name,
-            last_name,
-            admissionNumber,
-            role: role || 'user' // Default to 'user' if not provided, using 'role' field
+            password, 
+            role: role || 'user' // automatically set to user, as admins are set manually
         });
 
         await newUser.save();

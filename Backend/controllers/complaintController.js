@@ -2,14 +2,14 @@
 
 const Complaint = require('../models/Complaint');
 const Department = require('../models/department');
-const User = require('../models/User'); // Ensure this line is present and correctly imports your User model.
+const User = require('../models/User'); 
 const multer = require('multer');
 const path = require('path');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
-const fs = require('fs'); // Import file system module for deleting files
-const sendEmail = require('../utils/emailService'); // Ensure this line is present and imports your email service.
-const {createNotification} = require('../controllers/notificationController'); // Import the createNotification function
+const fs = require('fs'); 
+const sendEmail = require('../utils/emailService'); 
+const {createNotification} = require('../controllers/notificationController'); 
 
 // --- Multer Configuration for File Uploads ---
 
