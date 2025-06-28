@@ -84,6 +84,8 @@ const ViewComplaints = () => {
         fetchComplaints();
     }, [navigate]); // Dependency array: re-run if navigate changes
 
+    
+
     const getStatusClassName = (status) => {
         switch (status) {
             case 'Open':
