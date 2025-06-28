@@ -7,9 +7,11 @@ import Register from './pages/Register';
 import UserDashboard from './pages/userDash';
 import ComplaintPage from './pages/complaintPage';
 import ViewComplaints from './pages/viewComplaints';
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/userProfilePage';
 import AdminDashboard from './pages/adminDash';
+import AdminProfilePage from './pages/adminProfilePage';
 import ProtectedRoute from './components/protectedRoutes';
+import ComplaintDetails from './pages/complaintDetails';
 import NotificationPage from './pages/notificationPage';
 
 function App() {
@@ -90,6 +92,14 @@ function App() {
                     } 
                 />
                 <Route 
+                    path="/complaint/:id" 
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <ComplaintDetails />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
                     path="/admin/in-progress" 
                     element={
                         <ProtectedRoute requiredRole="admin">
@@ -110,6 +120,14 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/admin/profile" 
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <AdminProfilePage />
                         </ProtectedRoute>
                     } 
                 />

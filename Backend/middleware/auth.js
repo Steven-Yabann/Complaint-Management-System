@@ -43,3 +43,20 @@ exports.authorize = (...roles) => {
         next();
     };
 };
+
+// Enhanced authorize for admin routes that require department assignment
+exports.authorizeAdminWithDepartment = () => {
+    return (req, res, next) => {
+        // Check if user is admin
+        if (req.user.role !== 'admin') {
+            return next(new ErrorResponse('User role is not authorized to access this route', 403));
+        }
+
+        // Check if admin has a department ObjectId assigned
+        if (!req.user.department) {
+            return next(new ErrorResponse('Admin user does not have a department assigned. Please contact system administrator.', 400));
+        }
+
+        next();
+    };
+};

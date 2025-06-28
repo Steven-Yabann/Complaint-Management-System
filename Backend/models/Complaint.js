@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const ComplaintSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
+        ref: 'User', 
         required: true
     },
     title: {
@@ -16,13 +16,13 @@ const ComplaintSchema = new mongoose.Schema({
     },
     department: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Department', // Reference to the Department model
+        ref: 'Department', 
         required: [true, 'Please select a department/building']
     },
     description: {
         type: String,
         required: [true, 'Please add a description'],
-        maxlength: [500, 'Description cannot be more than 500 characters'] // Matches your frontend MAX_DESCRIPTION_LENGTH
+        maxlength: [500, 'Description cannot be more than 500 characters'] 
     },
     status: {
         type: String,
@@ -41,6 +41,10 @@ const ComplaintSchema = new mongoose.Schema({
             mimetype: String
         }
     ],
+    seen: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
