@@ -1,7 +1,7 @@
 // backend/controllers/complaint_controller.js
 
 const Complaint = require('../models/Complaint');
-const Department = require('../models/department');
+const Department = require('../models/Department');
 const User = require('../models/User'); 
 const multer = require('multer');
 const path = require('path');
