@@ -202,12 +202,13 @@ const ComplaintDetails = () => {
 										<div key={index} className="attachment-item">
 											<span className="attachment-icon">📎</span>
 											<a 
-												href={`http://localhost:4000${attachment.filepath.split('public')[1]}`}
+												href={`http://localhost:4000${attachment.filepath}`}
 												target="_blank"
 												rel="noopener noreferrer"
 												className="attachment-link"
 											>
 												{attachment.filename}
+												{console.log(attachment.filepath)}
 											</a>
 											<span className="attachment-type">
 												({attachment.mimetype})
