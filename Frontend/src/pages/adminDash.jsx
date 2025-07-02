@@ -1,7 +1,7 @@
 // frontend/src/pages/AdminDashboard.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import '../styling/adminDash.css';
 import { 
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 
 const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment, searchTerm, onSearchChange }) => {
+    const navigate = useNavigate();
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'open': return 'status-open';
@@ -52,6 +53,10 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment, searchTe
         } catch (error) {
             console.error('Error updating complaint status:', error);
         }
+    };
+
+    const handleViewComplaint = (complaintId) => {
+        navigate(`/complaint/${complaintId}`);
     };
 
     return (
@@ -157,7 +162,7 @@ const ComplaintsTable = ({ complaints, onStatusUpdate, adminDepartment, searchTe
                                 </select>
                                 <button 
                                     className="view-btn"
-                                    onClick={() => {/* Handle view complaint details */}}
+                                    onClick={() => handleViewComplaint(complaint._id)}
                                 >
                                     View
                                 </button>
