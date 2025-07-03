@@ -1,4 +1,4 @@
-// Frontend/src/components/ProtectedRoute.jsx
+// Frontend/src/components/protectedRoutes.jsx (Updated for Super Admin support)
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
@@ -32,7 +32,9 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
             
             if (userRole !== requiredRole) {
                 // Redirect to appropriate dashboard based on actual role
-                if (userRole === 'admin') {
+                if (userRole === 'superadmin') {
+                    return <Navigate to="/super-admin/dashboard" replace />;
+                } else if (userRole === 'admin') {
                     return <Navigate to="/admin/dashboard" replace />;
                 } else {
                     return <Navigate to="/dashboard" replace />;

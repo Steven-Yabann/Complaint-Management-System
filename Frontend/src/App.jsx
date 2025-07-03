@@ -1,4 +1,4 @@
-// Frontend/src/App.jsx
+// Frontend/src/App.jsx (Updated with Super Admin routes)
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -10,6 +10,7 @@ import ViewComplaints from './pages/viewComplaints';
 import ProfilePage from './pages/userProfilePage';
 import AdminDashboard from './pages/adminDash';
 import AdminProfilePage from './pages/adminProfilePage';
+import SuperAdminDashboard from './pages/superAdminDashboard'; 
 import ProtectedRoute from './components/protectedRoutes';
 import ComplaintDetails from './pages/complaintDetails';
 import NotificationPage from './pages/notificationPage';
@@ -128,6 +129,32 @@ function App() {
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminProfilePage />
+                        </ProtectedRoute>
+                    } 
+                />
+
+                {/* Super Admin routes - require superadmin role */}
+                <Route 
+                    path="/super-admin/dashboard" 
+                    element={
+                        <ProtectedRoute requiredRole="superadmin">
+                            <SuperAdminDashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/super-admin/users" 
+                    element={
+                        <ProtectedRoute requiredRole="superadmin">
+                            <SuperAdminDashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/super-admin/departments" 
+                    element={
+                        <ProtectedRoute requiredRole="superadmin">
+                            <SuperAdminDashboard />
                         </ProtectedRoute>
                     } 
                 />

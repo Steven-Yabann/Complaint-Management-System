@@ -1,4 +1,5 @@
-// Backend/server.js
+// Backend/server.js (Updated to include super admin routes)
+
 require('dotenv').config({ path: './config.env' }); 
 const express = require('express');
 const connectDB = require('./DB/conn'); 
@@ -10,9 +11,10 @@ const errorHandler = require('./middleware/error');
 const departmentRoutes = require('./Routes/departmentRoutes');
 const complaintRoutes = require('./Routes/complaintRoutes');
 const userRoutes = require('./Routes/userRoutes');
-const adminRoutes = require('./Routes/adminRoutes'); // Add admin routes
-const notificationRoutes = require('./Routes/notificationRoutes'); // Add notification routes
-const feedbackRoutes = require('./Routes/feedbackRoutes'); // Add feedback routes
+const adminRoutes = require('./Routes/adminRoutes');
+const superAdminRoutes = require('./Routes/superAdminRoutes'); // New route
+const notificationRoutes = require('./Routes/notificationRoutes');
+const feedbackRoutes = require('./Routes/feedbackRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -30,10 +32,10 @@ app.use('/api', authRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes); 
-app.use('/api/notifications', notificationRoutes); // Add notification routes
-app.use('/api/feedback', feedbackRoutes); // Add feedback routes
-
+app.use('/api/admin', adminRoutes);
+app.use('/api/super-admin', superAdminRoutes); // New super admin routes
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Simple test route
 app.get('/', (req, res) => {

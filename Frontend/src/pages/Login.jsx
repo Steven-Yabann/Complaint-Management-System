@@ -1,8 +1,8 @@
-// Frontend/src/pages/Login.jsx
+// Frontend/src/pages/Login.jsx (Updated for super admin redirect)
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import '../styling/login.css'; // This will contain the updated styles
+import '../styling/login.css';
 import loginImg from '../assets/stc.jpg';
 import { jwtDecode } from 'jwt-decode';
 
@@ -55,7 +55,7 @@ const LoginPage = () => {
         e.preventDefault();
         setLoginMessage('');
         const isValid = validateLogin();
-        console.log("formData", formData);
+        
         if (isValid) {
             try {
                 const response = await fetch('http://localhost:4000/api/login', { 
@@ -90,7 +90,9 @@ const LoginPage = () => {
                         
                         // Redirect based on role
                         setTimeout(() => {
-                            if (userRole === 'admin') {
+                            if (userRole === 'superadmin') {
+                                navigate('/super-admin/dashboard');
+                            } else if (userRole === 'admin') {
                                 navigate('/admin/dashboard');
                             } else {
                                 navigate('/dashboard');
@@ -118,7 +120,6 @@ const LoginPage = () => {
     };
 
     return (
-        // Added a new wrapper div specifically for centering the login page
         <div className="login-page-wrapper">
             <div className="auth-container login-view">
                 <div className="image-panel">
