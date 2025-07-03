@@ -1,26 +1,41 @@
-/* AdminDashboard.css */
+/* AdminDashboard.css - Updated to match user dashboard styling */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 .admin-dashboard-container {
     display: flex;
     min-height: 100vh;
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    overflow: hidden;
 }
 
-/* Sidebar Styling */
+/* Sidebar Styling - Matching user dashboard */
 .admin-sidebar {
-    width: 280px;
-    background-color: #e8e9ea;
-    border-right: 1px solid #dee2e6;
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
     padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    margin: 0;
+    transition: left 0.3s ease;
 }
 
 .sidebar-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     padding: 0 20px;
+    padding-top: 0;
 }
 
 .bics-logo {
@@ -31,6 +46,7 @@
     font-weight: bold;
     border-radius: 6px;
     letter-spacing: 1px;
+    word-break: break-word;
 }
 
 .admin-sidebar-links {
@@ -41,25 +57,26 @@
 }
 
 .admin-sidebar-links li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .admin-sidebar-links a {
     display: flex;
     align-items: center;
-    color: #495057;
+    color: white;
     text-decoration: none;
-    padding: 15px 25px;
-    font-size: 1em;
+    padding: 12px 25px;
+    font-size: 1.05em;
     transition: all 0.3s ease;
-    border-radius: 0 25px 25px 0;
-    margin-right: 15px;
+    border-left: 5px solid transparent;
+    box-sizing: border-box;
 }
 
 .admin-sidebar-links a:hover,
 .admin-sidebar-links a.active {
-    background-color: #495057;
-    color: white;
+    background-color: #34495e;
+    border-left: 5px solid #2980b9;
+    padding-left: 20px;
 }
 
 .nav-icon {
@@ -69,9 +86,10 @@
     text-align: center;
 }
 
-/* Main Content Area */
+/* Main Content Area - Matching user dashboard */
 .admin-main-content {
     flex-grow: 1;
+    padding: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -85,6 +103,7 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: -30px -30px 30px -30px;
 }
 
 .header-title {
@@ -169,17 +188,59 @@
 /* Content Area */
 .admin-content {
     flex-grow: 1;
-    padding: 30px;
+}
+
+/* Main Content Header - Matching user dashboard */
+.main-content-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.main-content-header h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin: 0;
+}
+
+/* Dashboard Widget Styling - Matching user dashboard */
+.dashboard-widget {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+}
+
+.dashboard-widget:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-widget h2 {
+    font-size: 1.5em;
+    color: #34495e;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
 }
 
 /* Dashboard Overview */
-.dashboard-overview h1,
-.complaints-header h1,
-.analytics-container h1 {
-    font-size: 2.2em;
-    color: #343a40;
-    margin-bottom: 25px;
-    font-weight: 600;
+.dashboard-overview h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin: 0 0 30px 0;
+}
+
+.department-subtitle {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    font-style: italic;
+    text-align: center;
 }
 
 .overview-stats {
@@ -192,14 +253,14 @@
 .stat-card {
     background-color: white;
     padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     text-align: center;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease-in-out;
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
 }
 
 .stat-card h3 {
@@ -228,19 +289,115 @@
     border-radius: 8px;
     font-weight: 500;
     text-align: center;
+    margin-top: 20px;
+}
+
+.no-department-complaints {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.no-department-complaints p {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin: 0;
 }
 
 /* Complaints Table */
 .complaints-table-container {
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     overflow: hidden;
 }
 
 .complaints-header {
     padding: 25px 30px 20px;
     border-bottom: 1px solid #dee2e6;
+}
+
+.complaints-header h1 {
+    font-size: 2.2em;
+    color: #343a40;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.complaints-header .department-subtitle {
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+/* Search Section */
+.complaints-search-section {
+    margin: 20px 0;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+}
+
+.search-container {
+    position: relative;
+    max-width: 500px;
+    margin-bottom: 10px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.2em;
+    pointer-events: none;
+}
+
+.search-results-info {
+    margin-top: 8px;
+}
+
+.search-results-text {
+    color: #6c757d;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.clear-search-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    background-color: #0056b3;
 }
 
 .complaints-table {
@@ -346,308 +503,7 @@
     text-align: center;
     color: #6c757d;
     font-style: italic;
-}
-
-/* Analytics */
-.analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.analytics-card {
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    text-align: center;
-}
-
-.analytics-card h3 {
-    font-size: 1.1em;
-    color: #6c757d;
-    margin: 0 0 15px 0;
-    font-weight: 500;
-}
-
-.analytics-number {
-    font-size: 2.8em;
-    font-weight: bold;
-    color: #343a40;
-    display: block;
-}
-
-/* Loading and Error States */
-.loading, .error {
-    text-align: center;
-    padding: 50px;
-    font-size: 1.1em;
-    color: #6c757d;
-}
-
-.error {
-    color: #dc3545;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .admin-dashboard-container {
-        flex-direction: column;
-    }
-    
-    .admin-sidebar {
-        width: 100%;
-        order: 2;
-    }
-    
-    .admin-main-content {
-        order: 1;
-    }
-    
-    .table-header,
-    .table-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .header-cell,
-    .table-cell {
-        padding: 10px;
-    }
-    
-    .overview-stats {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Additional CSS for AdminDashboard.css - Department-specific styling */
-
-/* Department subtitle styling */
-.department-subtitle {
-    color: #6c757d;
-    font-size: 0.9em;
-    margin-bottom: 20px;
-    font-style: italic;
-    text-align: center;
-}
-
-.complaints-header .department-subtitle {
-    text-align: left;
-    margin-top: 5px;
-    margin-bottom: 15px;
-}
-
-/* No department complaints message */
-.no-department-complaints {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 30px;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.no-department-complaints p {
-    color: #6c757d;
-    font-size: 1.1em;
-    margin: 0;
-}
-
-/* Enhanced sidebar logo to show department */
-.bics-logo {
-    background-color: #6c757d;
-    color: white;
-    padding: 12px 15px;
-    font-size: 1.1em;
-    font-weight: bold;
-    border-radius: 6px;
-    letter-spacing: 1px;
-    text-align: center;
-    word-break: break-word; /* Handle long department names */
-}
-
-/* Enhanced admin role display */
-.admin-role {
-    font-size: 0.75em;
-    color: #6c757d;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-}
-
-/* Enhanced header title for department */
-.header-title {
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #343a40;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Enhanced unseen notification for department context */
-.unseen-notification {
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    color: #856404;
-    padding: 15px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Responsive adjustments for department names */
-@media (max-width: 768px) {
-    .bics-logo {
-        font-size: 1em;
-        padding: 10px 12px;
-    }
-    
-    .header-title {
-        font-size: 1em;
-    }
-    
-    .admin-role {
-        font-size: 0.7em;
-        max-width: 150px;
-    }
-    
-    .department-subtitle {
-        font-size: 0.8em;
-    }
-}
-
-@media (max-width: 480px) {
-    .bics-logo {
-        font-size: 0.9em;
-        padding: 8px 10px;
-        letter-spacing: 0.5px;
-    }
-    
-    .header-title {
-        font-size: 0.9em;
-        max-width: 200px;
-    }
-    
-    .complaints-header h1 {
-        font-size: 1.8em;
-    }
-    
-    .no-department-complaints {
-        padding: 20px;
-    }
-    
-    .no-department-complaints p {
-        font-size: 1em;
-    }
-}
-
-/* Department subtitle styling */
-.department-subtitle {
-    color: #6c757d;
-    font-size: 0.9em;
-    margin-bottom: 20px;
-    font-style: italic;
-    text-align: center;
-}
-
-.complaints-header .department-subtitle {
-    text-align: left;
-    margin-top: 5px;
-    margin-bottom: 15px;
-}
-
-/* No department complaints message */
-.no-department-complaints {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 30px;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.no-department-complaints p {
-    color: #6c757d;
-    font-size: 1.1em;
-    margin: 0;
-}
-
-/* Add these styles to Frontend/src/styling/adminDash.css */
-
-/* Search Section Styling */
-.complaints-search-section {
-    margin: 20px 0;
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 20px;
-}
-
-.search-container {
-    position: relative;
-    max-width: 500px;
-    margin-bottom: 10px;
-}
-
-.search-input {
-    width: 100%;
-    padding: 12px 45px 12px 15px;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    font-size: 1em;
-    background-color: #f8f9fa;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: #007bff;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.search-input::placeholder {
-    color: #6c757d;
-    font-style: italic;
-}
-
-.search-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    font-size: 1.2em;
-    pointer-events: none;
-}
-
-.search-results-info {
-    margin-top: 8px;
-}
-
-.search-results-text {
-    color: #6c757d;
-    font-size: 0.9em;
-    font-style: italic;
-}
-
-/* Clear search button */
-.clear-search-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    margin-top: 10px;
-    transition: background-color 0.2s ease;
-}
-
-.clear-search-btn:hover {
-    background-color: #0056b3;
+    line-height: 1.6;
 }
 
 /* Highlight search results */
@@ -659,61 +515,14 @@ mark {
     font-weight: bold;
 }
 
-/* Enhanced no complaints message */
-.no-complaints {
-    padding: 40px;
-    text-align: center;
-    color: #6c757d;
-    font-style: italic;
-    line-height: 1.6;
+/* Analytics */
+.analytics-container h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 600;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .search-container {
-        max-width: 100%;
-    }
-    
-    .search-input {
-        padding: 10px 40px 10px 12px;
-        font-size: 0.9em;
-    }
-    
-    .search-icon {
-        right: 12px;
-        font-size: 1.1em;
-    }
-    
-    .search-results-text {
-        font-size: 0.8em;
-    }
-}
-
-@media (max-width: 480px) {
-    .complaints-search-section {
-        margin: 15px 0;
-        padding-bottom: 15px;
-    }
-    
-    .search-input {
-        padding: 8px 35px 8px 10px;
-        font-size: 0.85em;
-    }
-    
-    .search-icon {
-        right: 10px;
-        font-size: 1em;
-    }
-    
-    .clear-search-btn {
-        padding: 6px 12px;
-        font-size: 0.8em;
-    }
-}
-
-/* Enhanced Analytics Styles - Add these to adminDash.css */
-
-/* Analytics Header */
 .analytics-header {
     display: flex;
     justify-content: space-between;
@@ -723,19 +532,11 @@ mark {
     border-bottom: 2px solid #dee2e6;
 }
 
-.analytics-header h1 {
-    margin: 0;
-    color: #343a40;
-    font-size: 2.2em;
-    font-weight: 600;
-}
-
 .analytics-actions {
     display: flex;
     gap: 10px;
 }
 
-/* Download Buttons */
 .download-btn {
     padding: 8px 16px;
     border: none;
@@ -776,6 +577,59 @@ mark {
     transform: none;
 }
 
+/* Analytics Grid */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.analytics-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.analytics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-card h3 {
+    font-size: 1em;
+    color: #6c757d;
+    margin: 0 0 15px 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.analytics-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #343a40;
+    display: block;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
 /* Charts Section */
 .charts-section {
     margin: 40px 0;
@@ -787,8 +641,8 @@ mark {
 .chart-container {
     background-color: white;
     padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     border: 1px solid #e9ecef;
 }
 
@@ -818,8 +672,8 @@ mark {
 
 .table-container {
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(99, 75, 75, 0.08);
     overflow: hidden;
     border: 1px solid #e9ecef;
 }
@@ -840,7 +694,6 @@ mark {
     font-weight: 600;
 }
 
-/* Analytics Tables */
 .analytics-table-wrapper {
     overflow-x: auto;
     max-height: 400px;
@@ -901,68 +754,6 @@ mark {
     position: relative;
 }
 
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background-image: linear-gradient(
-        -45deg,
-        rgba(255, 255, 255, 0.2) 25%,
-        transparent 25%,
-        transparent 50%,
-        rgba(255, 255, 255, 0.2) 50%,
-        rgba(255, 255, 255, 0.2) 75%,
-        transparent 75%,
-        transparent
-    );
-    background-size: 50px 50px;
-    animation: move 2s linear infinite;
-}
-
-@keyframes move {
-    0% {
-        background-position: 0 0;
-    }
-    100% {
-        background-position: 50px 50px;
-    }
-}
-
-/* Status Badges in Tables */
-.analytics-table .status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75em;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    display: inline-block;
-    min-width: 60px;
-    text-align: center;
-}
-
-.analytics-table .status-badge.open {
-    background-color: #fee;
-    color: #dc3545;
-    border: 1px solid #f5c6cb;
-}
-
-.analytics-table .status-badge.in-progress {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.analytics-table .status-badge.resolved,
-.analytics-table .status-badge.closed {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
 /* Rating Display */
 .rating-display {
     display: flex;
@@ -979,61 +770,86 @@ mark {
     color: #ffc107;
 }
 
-/* Enhanced Analytics Cards */
-.analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.analytics-card {
-    background-color: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+/* Loading and Error States */
+.loading, .error {
     text-align: center;
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-    position: relative;
-    overflow: hidden;
-}
-
-.analytics-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #007bff, #0056b3);
-}
-
-.analytics-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.analytics-card h3 {
-    font-size: 1em;
+    padding: 50px;
+    font-size: 1.1em;
     color: #6c757d;
-    margin: 0 0 15px 0;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-.analytics-number {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #343a40;
-    display: block;
-    line-height: 1;
-    margin-bottom: 5px;
+.error {
+    color: #dc3545;
 }
 
-/* Responsive Design for Analytics */
-@media (max-width: 1200px) {
+/* Responsive Design */
+@media (max-width: 992px) {
+    .admin-dashboard-container {
+        flex-direction: column;
+    }
+    
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        padding: 15px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        order: 2;
+    }
+    
+    .admin-main-content {
+        order: 1;
+        padding: 25px;
+    }
+    
+    .admin-header {
+        margin: -25px -25px 25px -25px;
+    }
+    
+    .sidebar-header {
+        margin-bottom: 0;
+        padding: 0 15px;
+    }
+    
+    .admin-sidebar-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        flex-grow: 1;
+        gap: 10px;
+    }
+    
+    .admin-sidebar-links li {
+        margin: 0;
+    }
+    
+    .admin-sidebar-links a {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        text-align: center;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+    
+    .admin-sidebar-links a:hover,
+    .admin-sidebar-links a.active {
+        background-color: #34495e;
+        border-bottom-color: #2980b9;
+        border-left: none;
+        padding-left: 15px;
+    }
+    
+    .main-content-header h1 {
+        font-size: 2.2em;
+    }
+    
+    .overview-stats {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    
     .charts-section {
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         gap: 20px;
@@ -1052,6 +868,73 @@ mark {
 }
 
 @media (max-width: 768px) {
+    .admin-main-content {
+        padding: 20px;
+    }
+    
+    .admin-header {
+        margin: -20px -20px 20px -20px;
+        padding: 12px 20px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .main-content-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .main-content-header h1 {
+        font-size: 2em;
+    }
+    
+    .overview-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .stat-card {
+        padding: 20px 15px;
+    }
+    
+    .stat-number {
+        font-size: 2em;
+    }
+    
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .header-cell,
+    .table-cell {
+        padding: 10px;
+    }
+    
+    .complaints-table-container {
+        overflow-x: auto;
+    }
+    
+    .complaints-table {
+        min-width: 600px;
+    }
+    
+    .search-container {
+        max-width: 100%;
+    }
+    
+    .search-input {
+        padding: 10px 40px 10px 12px;
+        font-size: 0.9em;
+    }
+    
+    .search-icon {
+        right: 12px;
+        font-size: 1.1em;
+    }
+    
     .charts-section {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -1100,13 +983,82 @@ mark {
 }
 
 @media (max-width: 480px) {
-    .analytics-table-wrapper {
+    .admin-main-content {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        margin: -15px -15px 15px -15px;
+        padding: 10px 15px;
+    }
+    
+    .header-title {
+        font-size: 1em;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .admin-role {
+        font-size: 0.7em;
+        max-width: 150px;
+    }
+    
+    .main-content-header h1 {
+        font-size: 1.6em;
+    }
+    
+    .overview-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.8em;
+    }
+    
+    .complaints-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .department-subtitle {
+        font-size: 0.8em;
+    }
+    
+    .search-input {
+        padding: 8px 35px 8px 10px;
+        font-size: 0.85em;
+    }
+    
+    .search-icon {
+        right: 10px;
+        font-size: 1em;
+    }
+    
+    .clear-search-btn {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    
+    .table-cell {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
         font-size: 0.75em;
     }
     
-    .analytics-table th,
-    .analytics-table td {
-        padding: 6px 4px;
+    .view-btn,
+    .status-select {
+        padding: 4px 8px;
+        font-size: 0.75em;
     }
     
     .chart-container {
@@ -1132,74 +1084,12 @@ mark {
     .rating-display {
         font-size: 0.9em;
     }
-}
-
-/* Loading States */
-.analytics-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    color: #6c757d;
-    font-size: 1.1em;
-}
-
-.analytics-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #f5c6cb;
-    text-align: center;
-    margin: 20px 0;
-}
-
-/* Custom Scrollbar for Tables */
-.analytics-table-wrapper::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-.analytics-table-wrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.analytics-table-wrapper::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-.analytics-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Tooltip Enhancements */
-.recharts-tooltip-wrapper {
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.recharts-default-tooltip {
-    border-radius: 8px !important;
-    border: none !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Print Styles */
-@media print {
-    .analytics-actions,
-    .download-btn {
-        display: none;
+    
+    .no-department-complaints {
+        padding: 20px;
     }
     
-    .chart-container,
-    .table-container {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-    
-    .analytics-container {
-        background: white;
+    .no-department-complaints p {
+        font-size: 1em;
     }
 }
