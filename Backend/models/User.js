@@ -1,7 +1,7 @@
-// backend/models/User.js
+// Backend/models/User.js (Updated to include superadmin role)
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // Make sure you have bcryptjs installed: npm install bcryptjs
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -23,11 +23,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 6,
-        select: false // <<<--- RECOMMENDED: Do not return password by default on queries
+        select: false
     },
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'superadmin'], // Added superadmin role
         default: 'user'
     },
     department: {
@@ -35,25 +35,40 @@ const UserSchema = new mongoose.Schema({
         ref: 'Department',
         required: false
     },
-    // New fields for 2FA/Password Reset OTP (already present, good!)
+    // Fields for 2FA/Password Reset OTP
     otp: {
         type: String,
-        default: null // Stores the OTP sent to the user
+        default: null
     },
     otpExpires: {
         type: Date,
-        default: null // Stores the expiry time for the OTP
+        default: null
     },
-    // --- NEW FIELD: To track if user's email is verified ---
+    // Email verification
     isVerified: {
         type: Boolean,
-        default: false // New users are unverified by default
+        default: false
+    },
+    // Additional fields for super admin management
+    lastLogin: {
+        type: Date,
+        default: null
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false // Will be set when created by super admin
     },
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
+
 
 // Middleware to hash the password before saving
 UserSchema.pre('save', async function(next) {
