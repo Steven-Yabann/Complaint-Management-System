@@ -27,3 +27,4 @@ dist-ssr
 Backend/node_modules
 Backend/.env
 Backend/config.env
+Backend/seeders
