@@ -453,3 +453,52 @@
         font-size: 3em;
     }
 }
+.complaint-checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-direction: row;
+}
+
+.complaint-checkbox-group input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #5cb85c;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    margin-right: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+
+.complaint-checkbox-group input[type="checkbox"]:checked {
+    background-color: #5cb85c;
+    border-color: #5cb85c;
+}
+
+.complaint-checkbox-group input[type="checkbox"]:checked::after {
+    content: '\2713';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.complaint-checkbox-group input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.5);
+}
+
+.complaint-checkbox-group label[for="isBuildingComplaint"] {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
