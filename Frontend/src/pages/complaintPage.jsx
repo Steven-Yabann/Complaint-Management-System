@@ -1,12 +1,10 @@
-// frontend/src/pages/ComplaintPage.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import UserNavbar from '../components/userNavbar'; // Import the UserNavbar component
-import '../styling/complaintPage.css'; // Keep component-specific styling
-import '../styling/userDash.css'; // Import userDash.css for the main container and layout classes
-import '../styling/navbar.css'; // Import navbar.css for the UserNavbar's styling
+import UserNavbar from '../components/userNavbar';
+import '../styling/complaintPage.css';
+import '../styling/userDash.css';
+import '../styling/navbar.css';
 
 const ComplaintPage = () => {
     const { id } = useParams();
@@ -20,17 +18,35 @@ const ComplaintPage = () => {
         description: '',
         status: 'Open',
         priority: 'Medium',
-        attachments: null
+        attachments: null,
+        // --- START: Added building related state (string type) ---
+        isBuildingComplaint: false, // State for the checkbox
+        building: '' // State for the building name (string)
+        // --- END: Added building related state ---
     });
 
     const [existingAttachments, setExistingAttachments] = useState([]);
     const [departments, setDepartments] = useState([]);
+    // --- START: Hardcoded building list and removed buildings state ---
+    const universityBuildings = [
+        "STMB Building",
+        "Student Center",
+        "Engineering Building",
+        "Phase 1 rooms",
+        "Phase 1 LT classes",
+        "SLS building",
+        "Main Library"
+        
+        // Add all your university building names here
+    ];
+    // --- END: Hardcoded building list and removed buildings state ---
+
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [username, setUsername] = useState('User'); // State to hold the username for the navbar
+    const [username, setUsername] = useState('User');
 
     // --- Complaint Title Suggestions ---
     const complaintTitleSuggestions = [
@@ -65,13 +81,11 @@ const ComplaintPage = () => {
         navigate('/login');
     };
 
-    
-
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const storedUsername = localStorage.getItem('username'); // Get username from localStorage
+        const storedUsername = localStorage.getItem('username');
         if (storedUsername) {
-            setUsername(storedUsername); // Set username for navbar
+            setUsername(storedUsername);
         }
 
         if (!token) {
@@ -86,18 +100,19 @@ const ComplaintPage = () => {
                 console.warn("Token expired. Please log in again.");
                 localStorage.removeItem('token');
                 localStorage.removeItem('userRole');
-                localStorage.removeItem('username'); // Clear username on token expiry
+                localStorage.removeItem('username');
                 navigate('/login');
             }
         } catch (e) {
             console.error("Error decoding token or token is invalid:", e);
-            setUserRole('user'); // Default to 'user' if token is invalid
-            localStorage.removeItem('token'); // Clear invalid token
-            localStorage.removeItem('username'); // Clear username for invalid token
+            setUserRole('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
             navigate('/login');
         }
     }, [navigate]);
 
+    // --- START: Fetch Departments (no change needed here for buildings) ---
     useEffect(() => {
         const fetchDepartments = async () => {
             const token = localStorage.getItem('token');
@@ -121,6 +136,7 @@ const ComplaintPage = () => {
         };
         fetchDepartments();
     }, [navigate]);
+    // --- END: Fetch Departments ---
 
     useEffect(() => {
         if (isEditMode) {
@@ -144,7 +160,11 @@ const ComplaintPage = () => {
                             description: complaint.description || '',
                             status: complaint.status || 'Open',
                             priority: complaint.priority || 'Medium',
-                            attachments: null
+                            attachments: null,
+                            // --- START: Populate building data in edit mode (string) ---
+                            isBuildingComplaint: complaint.building ? true : false, // Set based on if building name exists
+                            building: complaint.building || '' // Populate building name
+                            // --- END: Populate building data in edit mode ---
                         });
                         setExistingAttachments(complaint.attachments || []);
                     } else {
@@ -164,8 +184,18 @@ const ComplaintPage = () => {
     }, [id, isEditMode, navigate]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, type, checked } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+        // If 'isBuildingComplaint' is unchecked, clear the 'building' selection
+        if (name === 'isBuildingComplaint' && !checked) {
+            setFormData(prevData => ({
+                ...prevData,
+                building: ''
+            }));
+        }
     };
 
     const handleFileChange = (e) => {
@@ -197,6 +227,19 @@ const ComplaintPage = () => {
             complaintData.append('status', 'Open');
         }
         complaintData.append('priority', formData.priority);
+
+        // --- START: Append building data conditionally (string) ---
+        complaintData.append('isBuildingComplaint', formData.isBuildingComplaint);
+        if (formData.isBuildingComplaint && formData.building) {
+            complaintData.append('building', formData.building); // Send building name as string
+        } else if (formData.isBuildingComplaint && !formData.building) {
+            setMessage('Please select a building if the complaint is building-related.');
+            setLoading(false);
+            return;
+        }
+        // If isBuildingComplaint is false, the 'building' field will either be an empty string
+        // or not explicitly appended, which works fine as the backend will store null/empty string.
+        // --- END: Append building data conditionally ---
 
         if (formData.attachments) {
             for (let i = 0; i < formData.attachments.length; i++) {
@@ -248,7 +291,7 @@ const ComplaintPage = () => {
 
     if (loading && isEditMode) {
         return (
-            <div className="user-dashboard-container"> {/* Use the container for consistency */}
+            <div className="user-dashboard-container">
                 <UserNavbar username={username} onLogout={handleLogout} />
                 <main className="dashboard-main-content">
                     <div className="loading-state">Loading complaint data...</div>
@@ -259,7 +302,7 @@ const ComplaintPage = () => {
 
     if (fetchError && isEditMode) {
         return (
-            <div className="user-dashboard-container"> {/* Use the container for consistency */}
+            <div className="user-dashboard-container">
                 <UserNavbar username={username} onLogout={handleLogout} />
                 <main className="dashboard-main-content">
                     <div className="error-state">Error: {fetchError}</div>
@@ -270,7 +313,7 @@ const ComplaintPage = () => {
 
     if (userRole === null) {
         return (
-            <div className="user-dashboard-container"> {/* Use the container for consistency */}
+            <div className="user-dashboard-container">
                 <UserNavbar username={username} onLogout={handleLogout} />
                 <main className="dashboard-main-content">
                     <div className="loading-state">Loading user role...</div>
@@ -281,7 +324,6 @@ const ComplaintPage = () => {
 
     return (
         <div className="user-dashboard-container">
-            {/* Render the UserNavbar component here */}
             <UserNavbar username={username} onLogout={handleLogout} />
 
             <main className="dashboard-main-content">
@@ -357,6 +399,42 @@ const ComplaintPage = () => {
                                     ))}
                                 </select>
                             </div>
+
+
+                            {/* --- START: Added optional building section with hardcoded list --- */}
+                                <div className="form-group complaint-checkbox-group"> {/* <--- ADD THIS CLASS */}
+                                    <input
+                                        type="checkbox"
+                                        id="isBuildingComplaint"
+                                        name="isBuildingComplaint"
+                                        checked={formData.isBuildingComplaint}
+                                        onChange={handleChange}
+                                    />
+                                    <label htmlFor="isBuildingComplaint"> {/* Removed inline style */}
+                                        Is this complaint related to a specific building?
+                                    </label>
+                                </div>
+
+                                {formData.isBuildingComplaint && (
+                                    <div className="form-group">
+                                        <label htmlFor="building">Building</label>
+                                        <select
+                                            id="building"
+                                            name="building"
+                                            value={formData.building}
+                                            onChange={handleChange}
+                                            required={formData.isBuildingComplaint}
+                                        >
+                                            <option value="">Select Building</option>
+                                            {universityBuildings.map((buildingName, index) => (
+                                                <option key={index} value={buildingName}>
+                                                    {buildingName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                                {/* --- END: Added optional building section --- */}
 
                             <div className="form-group">
                                 <label htmlFor="description">Description</label>
