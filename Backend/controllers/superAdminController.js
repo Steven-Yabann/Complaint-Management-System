@@ -1,77 +1,74 @@
-// Backend/controllers/superAdminController.js
-
 const User = require('../models/User');
 const Department = require('../models/Department');
 const Complaint = require('../models/Complaint');
+const Feedback = require('../models/Feedback');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/emailService');
 
-// @desc    Get all users (admins and regular users)
+// @desc    Get all users with pagination and filtering
 // @route   GET /api/super-admin/users
 // @access  Private (Super Admin only)
 exports.getAllUsers = asyncHandler(async (req, res, next) => {
-	const { page = 1, limit = 20, role, search } = req.query;
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 20;
+	const startIndex = (page - 1) * limit;
+	const { role, search } = req.query;
 	
-	let query = {};
+	// Build filter object
+	const filter = { role: { $ne: 'superadmin' } };
 	
-	// Filter by role if specified
 	if (role && role !== 'all') {
-		query.role = role;
+		filter.role = role;
 	}
 	
-	// Search functionality
 	if (search) {
-		query.$or = [
+		filter.$or = [
 			{ username: { $regex: search, $options: 'i' } },
 			{ email: { $regex: search, $options: 'i' } }
 		];
 	}
 	
-	const users = await User.find(query)
+	const users = await User.find(filter)
 		.populate('department', 'name')
 		.select('-password')
 		.sort({ createdAt: -1 })
-		.limit(limit * 1)
-		.skip((page - 1) * limit);
+		.skip(startIndex)
+		.limit(limit);
 	
-	const total = await User.countDocuments(query);
+	const total = await User.countDocuments(filter);
+	const pages = Math.ceil(total / limit);
 	
 	res.status(200).json({
 		success: true,
 		count: users.length,
+		pages,
 		total,
-		pages: Math.ceil(total / limit),
-		currentPage: page,
 		data: users
 	});
 });
 
-// @desc    Create new admin user
+// @desc    Create admin user
 // @route   POST /api/super-admin/create-admin
 // @access  Private (Super Admin only)
 exports.createAdmin = asyncHandler(async (req, res, next) => {
-	const { username, email, password, department } = req.body;
+	const { username, email, password } = req.body;
 	
 	if (!username || !email || !password) {
 		return next(new ErrorResponse('Please provide username, email, and password', 400));
 	}
 	
+	if (password.length < 6) {
+		return next(new ErrorResponse('Password must be at least 6 characters long', 400));
+	}
+	
 	// Check if user already exists
-	const existingUser = await User.findOne({
-		$or: [{ email: email.toLowerCase() }, { username }]
+	const existingUser = await User.findOne({ 
+		$or: [{ email: email.toLowerCase() }, { username }] 
 	});
 	
 	if (existingUser) {
 		return next(new ErrorResponse('User with this email or username already exists', 400));
-	}
-	
-	// Check if department exists (if provided)
-	if (department) {
-		const deptExists = await Department.findById(department);
-		if (!deptExists) {
-			return next(new ErrorResponse('Department not found', 404));
-		}
 	}
 	
 	// Create admin user
@@ -80,7 +77,6 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 		email: email.toLowerCase(),
 		password,
 		role: 'admin',
-		department: department || null,
 		isVerified: true // Auto-verify admin accounts
 	});
 	
@@ -99,7 +95,6 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 						<p><strong>Username:</strong> ${admin.username}</p>
 						<p><strong>Email:</strong> ${admin.email}</p>
 						<p><strong>Role:</strong> Administrator</p>
-						${department ? `<p><strong>Department:</strong> ${department}</p>` : ''}
 					</div>
 					<p>You can now log in to the admin panel using your credentials.</p>
 					<p>Please change your password after your first login for security.</p>
@@ -131,7 +126,7 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/super-admin/users/:id
 // @access  Private (Super Admin only)
 exports.updateUser = asyncHandler(async (req, res, next) => {
-	const { username, email, role, department, isVerified } = req.body;
+	const { username, email, role } = req.body;
 	
 	let user = await User.findById(req.params.id);
 	
@@ -144,23 +139,13 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Cannot change super admin role', 403));
 	}
 	
-	// Check if department exists (if provided)
-	if (department) {
-		const deptExists = await Department.findById(department);
-		if (!deptExists) {
-			return next(new ErrorResponse('Department not found', 404));
-		}
-	}
-	
-	// Update user
+	// Update user - removed department and isVerified fields
 	user = await User.findByIdAndUpdate(
 		req.params.id,
 		{
 			username: username || user.username,
 			email: email ? email.toLowerCase() : user.email,
-			role: role || user.role,
-			department: department !== undefined ? department : user.department,
-			isVerified: isVerified !== undefined ? isVerified : user.isVerified
+			role: role || user.role
 		},
 		{
 			new: true,
@@ -281,7 +266,7 @@ exports.updateDepartment = asyncHandler(async (req, res, next) => {
 		});
 		
 		if (existingDept) {
-			return next(new ErrorResponse('Department name already exists', 400));
+			return next(new ErrorResponse('Department with this name already exists', 400));
 		}
 	}
 	
@@ -394,6 +379,47 @@ exports.getSystemStats = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// @desc    Get all complaints for analytics
+// @route   GET /api/super-admin/complaints
+// @access  Private (Super Admin only)
+exports.getAllComplaints = asyncHandler(async (req, res, next) => {
+	const complaints = await Complaint.find()
+		.populate('user', 'username email')
+		.populate('department', 'name')
+		.sort({ createdAt: -1 });
+	
+	res.status(200).json({
+		success: true,
+		count: complaints.length,
+		data: complaints
+	});
+});
+
+// @desc    Get feedback analytics for super admin
+// @route   GET /api/super-admin/feedback-analytics
+// @access  Private (Super Admin only)
+exports.getFeedbackAnalytics = asyncHandler(async (req, res, next) => {
+	const feedback = await Feedback.find()
+		.populate({
+			path: 'submittedBy',
+			select: 'username email'
+		})
+		.populate({
+			path: 'complaint',
+			select: 'title status createdAt',
+			populate: {
+				path: 'department',
+				select: 'name'
+			}
+		})
+		.sort({ createdAt: -1 });
+
+	res.status(200).json({
+		success: true,
+		data: feedback
+	});
+});
+
 // @desc    Reset user password
 // @route   POST /api/super-admin/users/:id/reset-password
 // @access  Private (Super Admin only)
@@ -415,37 +441,11 @@ exports.resetUserPassword = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Cannot reset super admin password', 403));
 	}
 	
-	// Update password
 	user.password = newPassword;
 	await user.save();
 	
-	// Send notification email
-	try {
-		const mailOptions = {
-			to: user.email,
-			subject: 'Password Reset - Admin Action',
-			html: `
-				<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-					<h2 style="color: #e74c3c;">Password Reset Notification</h2>
-					<p>Hello <strong>${user.username}</strong>,</p>
-					<p>Your password has been reset by a system administrator.</p>
-					<p><strong>Important:</strong> Please log in with your new password and change it immediately for security.</p>
-					<p>If you did not request this password reset, please contact support immediately.</p>
-					<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-					<p style="color: #666; font-size: 12px;">
-						This is an automated message from the Complaint Management System.
-					</p>
-				</div>
-			`,
-		};
-		
-		await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
-	} catch (emailError) {
-		console.error('Error sending password reset email:', emailError);
-	}
-	
 	res.status(200).json({
 		success: true,
-		message: 'Password reset successfully. User has been notified via email.'
+		message: 'Password reset successfully'
 	});
 });
