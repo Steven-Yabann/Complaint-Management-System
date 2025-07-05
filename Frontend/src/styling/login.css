@@ -10,7 +10,7 @@
     min-height: 100vh; /* Takes full viewport height */
     width: 100vw; /* Takes full viewport width */
     overflow: hidden; /* Hide scrollbars if content overflows */
-    background-color: #f0f2f5; /* Consistent background for the login page */
+     /* Consistent background for the login page */
     font-family: 'Inter', sans-serif; /* Consistent font */
 }
 
@@ -108,7 +108,7 @@ h1 {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease-out; /* Use ease-out for smoother effect */
 }
 
@@ -135,7 +135,7 @@ h1 {
     margin-top: 2rem; /* Increased margin */
     border: none;
     border-radius: 8px; /* More rounded corners */
-    background: #f7901e;
+    background: #1e6af7;
     color: white;
     font-size: 1.2rem; /* Larger font */
     font-weight: 600; /* Bolder text */
@@ -145,7 +145,7 @@ h1 {
 }
 
 .primary-btn:hover {
-    background: #e07e0c;
+    background: #1e6af7;
     transform: translateY(-2px); /* Lift effect */
     box-shadow: 0 6px 15px rgba(247, 144, 30, 0.3); /* More pronounced shadow */
 }
@@ -164,7 +164,7 @@ h1 {
 .switch-btn ,.forgot-password{
     background: none;
     border: none;
-    color: #f7901e;
+    color: #1e6af7;
     cursor: pointer;
     font-weight: 700; /* Bolder */
     text-decoration: none; /* Remove default underline */
@@ -179,7 +179,7 @@ h1 {
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease;
 }
 
@@ -188,7 +188,7 @@ h1 {
 }
 
 .switch-btn:hover ,.forgot-password:hover {
-    color: #e07e0c;
+    color: #1e6af7;
 }
 
 .error-message {
@@ -237,7 +237,7 @@ h1 {
     position: absolute;
     top: 25px; /* Slightly more space from top */
     left: 30px; /* Slightly more space from left */
-    color: #ff7300;
+    color: #1e6af7;
     text-decoration: none;
     font-size: 1em;
     display: flex;
@@ -254,7 +254,7 @@ h1 {
 }
 
 .back-home-btn:hover {
-    color: #955104;
+    color: #1e6af7;
     background-color: rgba(255, 115, 0, 0.1); /* Subtle background on hover */
 }
 
@@ -455,7 +455,7 @@ h1 {
     /* Reusing similar styles to .switch-btn for consistency */
     background: none;
     border: none;
-    color: #f7901e;
+    color: #1e6af7;
     cursor: pointer;
     font-weight: 700;
     text-decoration: none;
@@ -472,7 +472,7 @@ h1 {
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease;
 }
 
@@ -483,7 +483,7 @@ h1 {
 
 .forgot-password-footer .back-to-login-link:hover,
 .reset-password-footer .back-to-login-link:hover {
-    color: #e07e0c;
+    color: #1e6af7;
 }
 
 
