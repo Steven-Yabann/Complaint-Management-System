@@ -161,7 +161,7 @@ h1 {
     font-size: 1em;
 }
 
-.switch-btn {
+.switch-btn ,.forgot-password{
     background: none;
     border: none;
     color: #f7901e;
@@ -172,7 +172,7 @@ h1 {
     padding-bottom: 2px; /* Space for the underline */
 }
 
-.switch-btn::after {
+.switch-btn::after ,.forgot-password::after {
     content: '';
     position: absolute;
     left: 0;
@@ -183,11 +183,11 @@ h1 {
     transition: width 0.3s ease;
 }
 
-.switch-btn:hover::after {
+.switch-btn:hover::after ,.forgot-password:hover::after {
     width: 100%;
 }
 
-.switch-btn:hover {
+.switch-btn:hover ,.forgot-password:hover {
     color: #e07e0c;
 }
 
@@ -373,7 +373,8 @@ h1 {
 }
 
 /* Style for the resend button when it's disabled (cooldown) */
-.form-footer .switch-btn:disabled {
+.form-footer .switch-btn:disabled ,
+.form-footer .switch-btn[disabled] {
     background-color: #ccc; /* Grey out */
     cursor: not-allowed; /* Change cursor */
     opacity: 0.7;
@@ -409,21 +410,7 @@ h1 {
 }
 
 /*for forgot and reset password*/
-/* frontend/src/styling/login.css */
 
-/* ... (Your existing login.css content here) ... */
-
-
-/* --- NEW STYLES FOR FORGOT PASSWORD AND RESET PASSWORD --- */
-
-/* Reusing .login-page-wrapper for overall centering and background */
-/* Reusing .auth-container for the main box layout */
-/* Reusing .form-panel for the content inside the box */
-
-/* Specific Adjustments for Forgot Password and Reset Password forms */
-
-/* Header for Forgot/Reset Password */
-/* You already have h1, but for p tags specifically under the header */
 .forgot-password-container p,
 .reset-password-container p {
     font-size: 1.05em; /* Slightly larger for clarity */

@@ -56,7 +56,7 @@ function ForgotPassword() { // This name must match export and App.jsx import
                         <button type="submit" className="primary-btn">Send Reset Link</button> {/* Text change to match button */}
                     </form>
                     <div className="forgot-password-footer">
-                        <Link to="/login" className="back-to-login-link">Back to Login</Link>
+                        <Link to="/login" className="back-to-login-link">Back to login</Link>
                     </div>
                 </div>
             </div>

@@ -159,7 +159,7 @@ const LoginPage = () => {
 
                         <button type="submit" className="primary-btn">Sign In</button>
                         <div className="form-footer">
-                            <Link to="/forgot-password" className="forgot-password-link">
+                            <Link to="/forgot-password" className="forgot-password">
                                 Forgot Password?
                             </Link>
                             <p>New here?</p>
