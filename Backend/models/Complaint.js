@@ -20,7 +20,7 @@ const ComplaintSchema = new mongoose.Schema({
     // --- START: Modified building field to be a String ---
     isBuildingComplaint: {
         type: Boolean,
-        default: false // Default to false, indicating it's not a building-specific complaint
+        default: false
     },
     building: {
         type: String, // Changed type to String
@@ -28,7 +28,7 @@ const ComplaintSchema = new mongoose.Schema({
         maxlength: [100, 'Building name cannot be more than 100 characters']
         // Not required here, conditional validation will be in the controller
     },
-    // --- END: Modified building field to be a String ---
+    
     description: {
         type: String,
         required: [true, 'Please add a description'],

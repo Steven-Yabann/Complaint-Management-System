@@ -1,8 +1,4 @@
-// Backend/Routes/superAdminRoutes.js
-
 const express = require('express');
-const router = express.Router();
-const { protect, authorize } = require('../middleware/auth');
 const {
 	getAllUsers,
 	createAdmin,
@@ -13,14 +9,19 @@ const {
 	updateDepartment,
 	deleteDepartment,
 	getSystemStats,
+	getAllComplaints,
+	getFeedbackAnalytics,
 	resetUserPassword
 } = require('../controllers/superAdminController');
+const { protect, authorize } = require('../middleware/auth');
 
-// Protect all routes and authorize only super admin
+const router = express.Router();
+
+// Apply authentication and authorization middleware to all routes
 router.use(protect);
 router.use(authorize('superadmin'));
 
-// User Management Routes
+// User management routes
 router.route('/users')
 	.get(getAllUsers);
 
@@ -34,7 +35,7 @@ router.route('/users/:id')
 router.route('/users/:id/reset-password')
 	.post(resetUserPassword);
 
-// Department Management Routes
+// Department management routes
 router.route('/departments')
 	.get(getAllDepartments)
 	.post(createDepartment);
@@ -43,8 +44,14 @@ router.route('/departments/:id')
 	.put(updateDepartment)
 	.delete(deleteDepartment);
 
-// System Statistics
+// Analytics and statistics routes
 router.route('/stats')
 	.get(getSystemStats);
+
+router.route('/complaints')
+	.get(getAllComplaints);
+
+router.route('/feedback-analytics')
+	.get(getFeedbackAnalytics);
 
 module.exports = router;
