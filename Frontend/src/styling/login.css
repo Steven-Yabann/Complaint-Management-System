@@ -10,7 +10,7 @@
     min-height: 100vh; /* Takes full viewport height */
     width: 100vw; /* Takes full viewport width */
     overflow: hidden; /* Hide scrollbars if content overflows */
-    background-color: #f0f2f5; /* Consistent background for the login page */
+     /* Consistent background for the login page */
     font-family: 'Inter', sans-serif; /* Consistent font */
 }
 
@@ -108,7 +108,7 @@ h1 {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease-out; /* Use ease-out for smoother effect */
 }
 
@@ -135,7 +135,7 @@ h1 {
     margin-top: 2rem; /* Increased margin */
     border: none;
     border-radius: 8px; /* More rounded corners */
-    background: #f7901e;
+    background: #1e6af7;
     color: white;
     font-size: 1.2rem; /* Larger font */
     font-weight: 600; /* Bolder text */
@@ -145,7 +145,7 @@ h1 {
 }
 
 .primary-btn:hover {
-    background: #e07e0c;
+    background: #1e6af7;
     transform: translateY(-2px); /* Lift effect */
     box-shadow: 0 6px 15px rgba(247, 144, 30, 0.3); /* More pronounced shadow */
 }
@@ -161,10 +161,10 @@ h1 {
     font-size: 1em;
 }
 
-.switch-btn {
+.switch-btn ,.forgot-password{
     background: none;
     border: none;
-    color: #f7901e;
+    color: #1e6af7;
     cursor: pointer;
     font-weight: 700; /* Bolder */
     text-decoration: none; /* Remove default underline */
@@ -172,23 +172,23 @@ h1 {
     padding-bottom: 2px; /* Space for the underline */
 }
 
-.switch-btn::after {
+.switch-btn::after ,.forgot-password::after {
     content: '';
     position: absolute;
     left: 0;
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease;
 }
 
-.switch-btn:hover::after {
+.switch-btn:hover::after ,.forgot-password:hover::after {
     width: 100%;
 }
 
-.switch-btn:hover {
-    color: #e07e0c;
+.switch-btn:hover ,.forgot-password:hover {
+    color: #1e6af7;
 }
 
 .error-message {
@@ -237,7 +237,7 @@ h1 {
     position: absolute;
     top: 25px; /* Slightly more space from top */
     left: 30px; /* Slightly more space from left */
-    color: #ff7300;
+    color: #1e6af7;
     text-decoration: none;
     font-size: 1em;
     display: flex;
@@ -254,7 +254,7 @@ h1 {
 }
 
 .back-home-btn:hover {
-    color: #955104;
+    color: #1e6af7;
     background-color: rgba(255, 115, 0, 0.1); /* Subtle background on hover */
 }
 
@@ -373,7 +373,8 @@ h1 {
 }
 
 /* Style for the resend button when it's disabled (cooldown) */
-.form-footer .switch-btn:disabled {
+.form-footer .switch-btn:disabled ,
+.form-footer .switch-btn[disabled] {
     background-color: #ccc; /* Grey out */
     cursor: not-allowed; /* Change cursor */
     opacity: 0.7;
@@ -409,21 +410,7 @@ h1 {
 }
 
 /*for forgot and reset password*/
-/* frontend/src/styling/login.css */
 
-/* ... (Your existing login.css content here) ... */
-
-
-/* --- NEW STYLES FOR FORGOT PASSWORD AND RESET PASSWORD --- */
-
-/* Reusing .login-page-wrapper for overall centering and background */
-/* Reusing .auth-container for the main box layout */
-/* Reusing .form-panel for the content inside the box */
-
-/* Specific Adjustments for Forgot Password and Reset Password forms */
-
-/* Header for Forgot/Reset Password */
-/* You already have h1, but for p tags specifically under the header */
 .forgot-password-container p,
 .reset-password-container p {
     font-size: 1.05em; /* Slightly larger for clarity */
@@ -468,7 +455,7 @@ h1 {
     /* Reusing similar styles to .switch-btn for consistency */
     background: none;
     border: none;
-    color: #f7901e;
+    color: #1e6af7;
     cursor: pointer;
     font-weight: 700;
     text-decoration: none;
@@ -485,7 +472,7 @@ h1 {
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: #f7901e;
+    background-color: #1e6af7;
     transition: width 0.3s ease;
 }
 
@@ -496,7 +483,7 @@ h1 {
 
 .forgot-password-footer .back-to-login-link:hover,
 .reset-password-footer .back-to-login-link:hover {
-    color: #e07e0c;
+    color: #1e6af7;
 }
 
 
