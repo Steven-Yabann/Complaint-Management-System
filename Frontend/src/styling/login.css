@@ -263,7 +263,7 @@ h1 {
     .auth-container {
         flex-direction: column; /* Stack panels vertically on smaller screens */
         width: 95%; /* Take more width on smaller screens */
-        min-height: auto; /* Auto height */
+        min-height: unset; /* Auto height (use unset for better browser support) */
         box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Lighter shadow when stacked */
     }
 
@@ -406,4 +406,130 @@ h1 {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/*for forgot and reset password*/
+/* frontend/src/styling/login.css */
+
+/* ... (Your existing login.css content here) ... */
+
+
+/* --- NEW STYLES FOR FORGOT PASSWORD AND RESET PASSWORD --- */
+
+/* Reusing .login-page-wrapper for overall centering and background */
+/* Reusing .auth-container for the main box layout */
+/* Reusing .form-panel for the content inside the box */
+
+/* Specific Adjustments for Forgot Password and Reset Password forms */
+
+/* Header for Forgot/Reset Password */
+/* You already have h1, but for p tags specifically under the header */
+.forgot-password-container p,
+.reset-password-container p {
+    font-size: 1.05em; /* Slightly larger for clarity */
+    color: #555;
+    margin-bottom: 1.5rem; /* Space below descriptive text */
+    max-width: 80%; /* Constrain width for readability */
+    line-height: 1.5;
+    text-align: center;
+}
+
+.forgot-password-container h2,
+.reset-password-container h2 {
+    margin-bottom: 1.5rem; /* Adjust margin to fit with new p style */
+    color: #333;
+    font-size: 2.2rem; /* Consistent with your h1 in login */
+    font-weight: 700;
+}
+
+
+/* Input Group for Forgot/Reset Password forms */
+/* Reusing .input-group and its sub-styles like input and span */
+
+/* The form itself, inheriting from form-panel */
+.forgot-password-form,
+.reset-password-form {
+    width: 100%; /* Ensure forms take available width within form-panel */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center form elements */
+    max-width: 400px; /* Max width for forms themselves */
+}
+
+/* Back to Login link */
+.forgot-password-footer,
+.reset-password-footer {
+    margin-top: 1.5rem; /* Consistent spacing */
+    text-align: center;
+}
+
+.forgot-password-footer .back-to-login-link,
+.reset-password-footer .back-to-login-link {
+    /* Reusing similar styles to .switch-btn for consistency */
+    background: none;
+    border: none;
+    color: #f7901e;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 2px;
+    transition: color 0.3s ease;
+}
+
+.forgot-password-footer .back-to-login-link::after,
+.reset-password-footer .back-to-login-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #f7901e;
+    transition: width 0.3s ease;
+}
+
+.forgot-password-footer .back-to-login-link:hover::after,
+.reset-password-footer .back-to-login-link:hover::after {
+    width: 100%;
+}
+
+.forgot-password-footer .back-to-login-link:hover,
+.reset-password-footer .back-to-login-link:hover {
+    color: #e07e0c;
+}
+
+
+/* Specific styles for message displays within these components */
+/* You already have .message.success and .message.error, which will be used */
+
+
+/* Responsive adjustments for forgot/reset password */
+@media (max-width: 768px) {
+    .forgot-password-container p,
+    .reset-password-container p {
+        font-size: 0.95em;
+        margin-bottom: 1rem;
+        max-width: 90%;
+    }
+
+    .forgot-password-container h2,
+    .reset-password-container h2 {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .forgot-password-container p,
+    .reset-password-container p {
+        font-size: 0.9em;
+        margin-bottom: 0.8rem;
+    }
+
+    .forgot-password-container h2,
+    .reset-password-container h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
 }

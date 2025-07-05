@@ -1,4 +1,4 @@
-// Frontend/src/pages/Login.jsx (Updated for super admin redirect)
+// Frontend/src/pages/Login.jsx (Updated for super admin redirect and Forgot Password)
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -55,10 +55,10 @@ const LoginPage = () => {
         e.preventDefault();
         setLoginMessage('');
         const isValid = validateLogin();
-        
+
         if (isValid) {
             try {
-                const response = await fetch('http://localhost:4000/api/login', { 
+                const response = await fetch('http://localhost:4000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -78,16 +78,16 @@ const LoginPage = () => {
                     // Decode token to get username and role
                     try {
                         const decodedToken = jwtDecode(data.token);
-                        
+
                         // Extract user info from token
                         const userInfo = decodedToken.user || decodedToken;
                         const username = userInfo.username || 'User';
                         const userRole = userInfo.role || 'user';
-                        
+
                         // Store user info in localStorage
                         localStorage.setItem('username', username);
                         localStorage.setItem('userRole', userRole);
-                        
+
                         // Redirect based on role
                         setTimeout(() => {
                             if (userRole === 'superadmin') {
@@ -159,6 +159,9 @@ const LoginPage = () => {
 
                         <button type="submit" className="primary-btn">Sign In</button>
                         <div className="form-footer">
+                            <Link to="/forgot-password" className="forgot-password-link">
+                                Forgot Password?
+                            </Link>
                             <p>New here?</p>
                             <Link to="/register" className="switch-btn">
                                 Create Account

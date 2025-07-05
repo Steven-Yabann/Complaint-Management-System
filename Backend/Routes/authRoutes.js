@@ -5,12 +5,15 @@ const router = express.Router();
 
 // Import all authentication-related controller functions.
 // Ensure this path is correct relative to auth_routes.js.
-const { 
-    loginUser, 
-    registerUser, 
-    verifyEmail,  // NEW: Import the email verification function
-    resendOtp     // NEW: Import the resend OTP function
-} = require('../controllers/authController');
+const {
+    loginUser,
+    registerUser,
+    verifyEmail,
+    resendOtp,
+    // NEW: Import the forgotPassword and resetPassword functions
+    forgotPassword,
+    resetPassword
+} = require('../controllers/authController'); // Make sure these functions are defined in authController.js
 
 // --- Public Routes for Authentication and Email Verification ---
 
@@ -33,5 +36,17 @@ router.post('/verify-email', verifyEmail);
 // @desc    Resend email verification OTP
 // @access  Public
 router.post('/resend-otp', resendOtp);
+
+// --- NEW: Routes for Forgot and Reset Password ---
+
+// @route   POST /api/auth/forgot-password
+// @desc    Request a password reset (sends OTP to email)
+// @access  Public
+router.post('/forgot-password', forgotPassword);
+
+// @route   POST /api/auth/reset-password/:otp
+// @desc    Reset password using the provided OTP and new password
+// @access  Public
+router.post('/reset-password/:otp', resetPassword);
 
 module.exports = router;
