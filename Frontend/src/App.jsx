@@ -1,4 +1,4 @@
-// Frontend/src/App.jsx (Updated with Super Admin routes)
+// Frontend/src/App.jsx (Updated with Forgot and Reset Password routes)
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -10,10 +10,14 @@ import ViewComplaints from './pages/viewComplaints';
 import ProfilePage from './pages/userProfilePage';
 import AdminDashboard from './pages/adminDash';
 import AdminProfilePage from './pages/adminProfilePage';
-import SuperAdminDashboard from './pages/superAdminDashboard'; 
+import SuperAdminDashboard from './pages/superAdminDashboard';
 import ProtectedRoute from './components/protectedRoutes';
 import ComplaintDetails from './pages/complaintDetails';
 import NotificationPage from './pages/notificationPage';
+
+// Import your new components for password reset
+import ForgotPassword from './components/forgotPassword'; // Assuming you put it here
+import ResetPassword from './components/resetPassword';
 
 function App() {
     return (
@@ -24,48 +28,52 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
+                {/* New: Forgot Password and Reset Password Routes */}
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
+
                 {/* User routes - require user role */}
-                <Route 
-                    path="/dashboard" 
+                <Route
+                    path="/dashboard"
                     element={
                         <ProtectedRoute requiredRole="user">
                             <UserDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/complaintPage" 
+                <Route
+                    path="/complaintPage"
                     element={
                         <ProtectedRoute requiredRole="user">
                             <ComplaintPage />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/complaintPage/:id" 
+                <Route
+                    path="/complaintPage/:id"
                     element={
                         <ProtectedRoute requiredRole="user">
                             <ComplaintPage />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/viewComplaints" 
+                <Route
+                    path="/viewComplaints"
                     element={
                         <ProtectedRoute requiredRole="user">
                             <ViewComplaints />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/profile" 
+                <Route
+                    path="/profile"
                     element={
                         <ProtectedRoute requiredRole="user">
                             <ProfilePage />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                
+
                 <Route
                     path="/notifications"
                     element={
@@ -76,87 +84,87 @@ function App() {
                 />
 
                 {/* Admin routes - require admin role */}
-                <Route 
-                    path="/admin/dashboard" 
+                <Route
+                    path="/admin/dashboard"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/admin/new" 
+                <Route
+                    path="/admin/new"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/complaint/:id" 
+                <Route
+                    path="/complaint/:id"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <ComplaintDetails />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/admin/in-progress" 
+                <Route
+                    path="/admin/in-progress"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/admin/resolved" 
+                <Route
+                    path="/admin/resolved"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/admin/analytics" 
+                <Route
+                    path="/admin/analytics"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/admin/profile" 
+                <Route
+                    path="/admin/profile"
                     element={
                         <ProtectedRoute requiredRole="admin">
                             <AdminProfilePage />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
 
                 {/* Super Admin routes - require superadmin role */}
-                <Route 
-                    path="/super-admin/dashboard" 
+                <Route
+                    path="/super-admin/dashboard"
                     element={
                         <ProtectedRoute requiredRole="superadmin">
                             <SuperAdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/super-admin/users" 
+                <Route
+                    path="/super-admin/users"
                     element={
                         <ProtectedRoute requiredRole="superadmin">
                             <SuperAdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
-                <Route 
-                    path="/super-admin/departments" 
+                <Route
+                    path="/super-admin/departments"
                     element={
                         <ProtectedRoute requiredRole="superadmin">
                             <SuperAdminDashboard />
                         </ProtectedRoute>
-                    } 
+                    }
                 />
 
                 {/* Catch all route - redirect to login */}
