@@ -48,11 +48,12 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 	});
 });
 
+// Updated createAdmin function in superAdminController.js
 // @desc    Create admin user
 // @route   POST /api/super-admin/create-admin
 // @access  Private (Super Admin only)
 exports.createAdmin = asyncHandler(async (req, res, next) => {
-	const { username, email, password } = req.body;
+	const { username, email, password, department } = req.body;
 	
 	if (!username || !email || !password) {
 		return next(new ErrorResponse('Please provide username, email, and password', 400));
@@ -60,6 +61,14 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 	
 	if (password.length < 6) {
 		return next(new ErrorResponse('Password must be at least 6 characters long', 400));
+	}
+	
+	// Validate department if provided
+	if (department) {
+		const departmentExists = await Department.findById(department);
+		if (!departmentExists) {
+			return next(new ErrorResponse('Department not found', 400));
+		}
 	}
 	
 	// Check if user already exists
@@ -71,17 +80,28 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('User with this email or username already exists', 400));
 	}
 	
-	// Create admin user
-	const admin = await User.create({
+	// Create admin user with department assignment
+	const adminData = {
 		username,
 		email: email.toLowerCase(),
 		password,
 		role: 'admin',
 		isVerified: true // Auto-verify admin accounts
-	});
+	};
+	
+	// Add department if provided
+	if (department) {
+		adminData.department = department;
+	}
+	
+	const admin = await User.create(adminData);
+	
+	// Populate department for response
+	await admin.populate('department', 'name');
 	
 	// Send welcome email to new admin
 	try {
+		const departmentInfo = admin.department ? ` for ${admin.department.name} department` : '';
 		const mailOptions = {
 			to: admin.email,
 			subject: 'Welcome - Admin Account Created',
@@ -89,12 +109,13 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 				<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
 					<h2 style="color: #2c3e50;">Welcome to the Admin Panel</h2>
 					<p>Hello <strong>${admin.username}</strong>,</p>
-					<p>Your administrator account has been created successfully.</p>
+					<p>Your administrator account has been created successfully${departmentInfo}.</p>
 					<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
 						<h3>Account Details:</h3>
 						<p><strong>Username:</strong> ${admin.username}</p>
 						<p><strong>Email:</strong> ${admin.email}</p>
 						<p><strong>Role:</strong> Administrator</p>
+						${admin.department ? `<p><strong>Department:</strong> ${admin.department.name}</p>` : ''}
 					</div>
 					<p>You can now log in to the admin panel using your credentials.</p>
 					<p>Please change your password after your first login for security.</p>
@@ -117,16 +138,17 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 	
 	res.status(201).json({
 		success: true,
-		message: 'Admin user created successfully',
+		message: `Admin user created successfully${admin.department ? ` and assigned to ${admin.department.name} department` : ''}`,
 		data: admin
 	});
 });
 
+// Updated updateUser function in superAdminController.js
 // @desc    Update user details
 // @route   PUT /api/super-admin/users/:id
 // @access  Private (Super Admin only)
 exports.updateUser = asyncHandler(async (req, res, next) => {
-	const { username, email, role } = req.body;
+	const { username, email, role, department } = req.body;
 	
 	let user = await User.findById(req.params.id);
 	
@@ -139,19 +161,90 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Cannot change super admin role', 403));
 	}
 	
-	// Update user - removed department and isVerified fields
+	// Validate department if provided
+	if (department) {
+		const departmentExists = await Department.findById(department);
+		if (!departmentExists) {
+			return next(new ErrorResponse('Department not found', 400));
+		}
+	}
+	
+	// Prepare update data
+	const updateData = {
+		username: username || user.username,
+		email: email ? email.toLowerCase() : user.email,
+		role: role || user.role
+	};
+	
+	// Handle department assignment
+	if (department !== undefined) {
+		// If department is empty string or null, remove department assignment
+		updateData.department = department || null;
+	}
+	
+	// Update user
 	user = await User.findByIdAndUpdate(
 		req.params.id,
-		{
-			username: username || user.username,
-			email: email ? email.toLowerCase() : user.email,
-			role: role || user.role
-		},
+		updateData,
 		{
 			new: true,
 			runValidators: true
 		}
 	).populate('department', 'name').select('-password');
+	
+	// Send notification email if role or department changed
+	if ((role && role !== user.role) || (department !== undefined)) {
+		try {
+			const roleChanged = role && role !== user.role;
+			const departmentChanged = department !== undefined;
+			
+			let subject = 'Account Updated';
+			let message = `Hello ${user.username},\n\nYour account has been updated by an administrator.\n\n`;
+			
+			if (roleChanged) {
+				message += `Your role has been changed to: ${role}\n`;
+			}
+			
+			if (departmentChanged) {
+				if (user.department) {
+					message += `You have been assigned to the ${user.department.name} department.\n`;
+				} else {
+					message += `Your department assignment has been removed.\n`;
+				}
+			}
+			
+			message += `\nIf you have any questions, please contact your system administrator.`;
+			
+			const mailOptions = {
+				to: user.email,
+				subject,
+				html: `
+					<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+						<h2 style="color: #2c3e50;">Account Updated</h2>
+						<p>Hello <strong>${user.username}</strong>,</p>
+						<p>Your account has been updated by an administrator.</p>
+						<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+							<h3>Updated Information:</h3>
+							${roleChanged ? `<p><strong>New Role:</strong> ${role}</p>` : ''}
+							${departmentChanged ? (user.department ? 
+								`<p><strong>Department:</strong> ${user.department.name}</p>` : 
+								`<p><strong>Department:</strong> No department assigned</p>`) : ''}
+						</div>
+						<p>If you have any questions, please contact your system administrator.</p>
+						<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+						<p style="color: #666; font-size: 12px;">
+							This is an automated message from the Complaint Management System.
+						</p>
+					</div>
+				`,
+			};
+			
+			await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
+		} catch (emailError) {
+			console.error('Error sending update notification email:', emailError);
+			// Don't fail the request if email fails
+		}
+	}
 	
 	res.status(200).json({
 		success: true,
