@@ -900,7 +900,7 @@ const AdminDashboard = () => {
                             to="/admin/dashboard" 
                             className={currentView === 'dashboard' ? 'active' : ''}
                         >
-                            <span className="nav-icon">⊚</span>
+                            
                             Dashboard
                         </Link>
                     </li>
@@ -909,7 +909,7 @@ const AdminDashboard = () => {
                             to="/admin/new" 
                             className={currentView === 'new' ? 'active' : ''}
                         >
-                            <span className="nav-icon">📋</span>
+                            
                             New Complaints
                         </Link>
                     </li>
@@ -918,7 +918,7 @@ const AdminDashboard = () => {
                             to="/admin/in-progress" 
                             className={currentView === 'in-progress' ? 'active' : ''}
                         >
-                            <span className="nav-icon">🕐</span>
+                            
                             In-Progress
                         </Link>
                     </li>
@@ -927,7 +927,7 @@ const AdminDashboard = () => {
                             to="/admin/resolved" 
                             className={currentView === 'resolved' ? 'active' : ''}
                         >
-                            <span className="nav-icon">✓</span>
+                            
                             Resolved
                         </Link>
                     </li>
@@ -936,7 +936,7 @@ const AdminDashboard = () => {
                             to="/admin/analytics" 
                             className={currentView === 'analytics' ? 'active' : ''}
                         >
-                            <span className="nav-icon">📊</span>
+                            
                             Analytics
                         </Link>
                     </li>

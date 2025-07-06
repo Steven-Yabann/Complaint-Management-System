@@ -825,13 +825,14 @@ const SuperAdminDashboard = () => {
 	);
 };
 
-// Modal Form Component - Updated to remove verified and department fields
+// Updated ModalForm Component in superAdminDashboard.jsx
 const ModalForm = ({ type, item, departments, onSubmit, onCancel }) => {
 	const [formData, setFormData] = useState({
 		username: item?.username || '',
 		email: item?.email || '',
 		password: '',
 		role: item?.role || 'user',
+		department: item?.department?._id || '',
 		name: item?.name || '',
 		description: item?.description || ''
 	});
@@ -846,13 +847,15 @@ const ModalForm = ({ type, item, departments, onSubmit, onCancel }) => {
 			submitData = {
 				username: formData.username,
 				email: formData.email,
-				password: formData.password
+				password: formData.password,
+				department: formData.department || null // Include department assignment
 			};
 		} else if (type === 'editUser') {
 			submitData = {
 				username: formData.username,
 				email: formData.email,
-				role: formData.role
+				role: formData.role,
+				department: formData.department || null // Allow department updates
 			};
 		} else if (type === 'createDepartment' || type === 'editDepartment') {
 			submitData = {
@@ -899,31 +902,75 @@ const ModalForm = ({ type, item, departments, onSubmit, onCancel }) => {
 					</div>
 
 					{type === 'createAdmin' && (
-						<div className="form-group">
-							<label>Password</label>
-							<input
-								type="password"
-								name="password"
-								value={formData.password}
-								onChange={handleChange}
-								required
-								minLength="6"
-							/>
-						</div>
+						<>
+							<div className="form-group">
+								<label>Password</label>
+								<input
+									type="password"
+									name="password"
+									value={formData.password}
+									onChange={handleChange}
+									required
+									minLength="6"
+								/>
+							</div>
+							
+							<div className="form-group">
+								<label>Department</label>
+								<select
+									name="department"
+									value={formData.department}
+									onChange={handleChange}
+								>
+									<option value="">Select Department (Optional)</option>
+									{departments.map(dept => (
+										<option key={dept._id} value={dept._id}>
+											{dept.name}
+										</option>
+									))}
+								</select>
+								<small className="form-help">
+									Assign this admin to a specific department. Leave blank if admin should have access to all departments.
+								</small>
+							</div>
+						</>
 					)}
 
 					{type === 'editUser' && (
-						<div className="form-group">
-							<label>Role</label>
-							<select
-								name="role"
-								value={formData.role}
-								onChange={handleChange}
-							>
-								<option value="user">User</option>
-								<option value="admin">Admin</option>
-							</select>
-						</div>
+						<>
+							<div className="form-group">
+								<label>Role</label>
+								<select
+									name="role"
+									value={formData.role}
+									onChange={handleChange}
+								>
+									<option value="user">User</option>
+									<option value="admin">Admin</option>
+								</select>
+							</div>
+							
+							{formData.role === 'admin' && (
+								<div className="form-group">
+									<label>Department</label>
+									<select
+										name="department"
+										value={formData.department}
+										onChange={handleChange}
+									>
+										<option value="">No Department</option>
+										{departments.map(dept => (
+											<option key={dept._id} value={dept._id}>
+												{dept.name}
+											</option>
+										))}
+									</select>
+									<small className="form-help">
+										Select the department this admin should manage.
+									</small>
+								</div>
+							)}
+						</>
 					)}
 				</>
 			)}
