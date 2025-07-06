@@ -29,8 +29,6 @@ function ForgotPassword() { // This name must match export and App.jsx import
     return (
         <div className="login-page-wrapper">
             <div className="auth-container login-view"> {/* Reusing login-view for layout */}
-                <div className="image-panel">
-                </div>
                 <div className="form-panel">
                     {/* Consistent back-home-btn with Login.jsx */}
                     <Link to="/" className="back-home-btn">Home</Link>
