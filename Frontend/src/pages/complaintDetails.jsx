@@ -192,6 +192,13 @@ const ComplaintDetails = () => {
 								<label>Department:</label>
 								<span>{complaint.department?.name || 'N/A'}</span>
 							</div>
+							{/* Display building information if it's a building complaint */}
+							{complaint.isBuildingComplaint && complaint.building && (
+								<div className="detail-row">
+									<label>Building:</label>
+									<span className="complaint-building">{complaint.building}</span>
+								</div>
+							)}
 						</div>
 
 						{complaint.attachments && complaint.attachments.length > 0 && (
