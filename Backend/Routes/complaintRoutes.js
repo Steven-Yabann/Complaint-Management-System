@@ -10,15 +10,18 @@ const {
     createComplaint,
     getUserComplaints,
     getComplaint,
-    updateComplaint,
     deleteComplaint,
     getAllComplaintsForAdmin,
-    updateComplaintStatus
-} = require('../controllers/complaintController');
+    // updateComplaintStatus, // <-- REMOVE THIS LINE, it no longer exists as a separate function
+    updateComplaint // <-- ADD THIS LINE, as this function now handles all updates
+} = require('../controllers/complaintController'); // Ensure this points to complaint_controller.js, not complaintController.js
+
+// Import your Multer upload instance from the dedicated middleware file
+const upload = require('../middleware/upload'); // <-- ADD THIS LINE. Make sure this path is correct based on where you put upload.js
 
 // --- User-specific complaint routes ---
 router.route('/')
-    .post(protect, createComplaint);
+    .post(protect, upload.array('attachments', 5), createComplaint); // <-- ADD upload middleware here
 
 router.route('/me')
     .get(protect, getUserComplaints);
@@ -32,9 +35,8 @@ router.route('/admin/all')
 // --- Routes for specific complaints by ID (common for both users and admins) ---
 router.route('/:id')
     .get(protect, getComplaint)
-    .put(protect, updateComplaintStatus)
+    .put(protect, upload.array('attachments', 5), updateComplaint) // <-- CHANGE THIS: use updateComplaint and ADD upload middleware
     .delete(protect, deleteComplaint);
-
 
 
 module.exports = router;
