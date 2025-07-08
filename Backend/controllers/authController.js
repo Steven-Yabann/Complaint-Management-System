@@ -1,23 +1,17 @@
-// backend/controllers/authController.js
-
 const User = require('../models/User.js');
 const bcrypt = require('bcryptjs'); // used for hashing passwords
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../utils/emailService'); // Import your email service
+const sendEmail = require('../utils/emailService'); 
 
 // Helper function to sign a JWT token
 const generateToken = (id, role, username) => {
-    // --- DEBUG LOG & DEFENSIVE CHECK FOR JWT_EXPIRE ---
-    // This console.log helps you verify what value JWT_EXPIRE is picking up from your .env file.
     console.log(`DEBUG: process.env.JWT_EXPIRE = "${process.env.JWT_EXPIRE}"`);
-    // Provide a fallback value (e.g., '1h' for 1 hour) in case process.env.JWT_EXPIRE is not properly loaded.
     const expiresInValue = process.env.JWT_EXPIRE || '1h';
-    // --- END DEBUG / DEFENSIVE CHECK ---
 
     return jwt.sign(
         { id, role, username },
         process.env.JWT_SECRET,
-        { expiresIn: expiresInValue } // Use the validated/default value here
+        { expiresIn: expiresInValue } 
     );
 };
 
@@ -25,14 +19,10 @@ const generateToken = (id, role, username) => {
 // @route   POST /api/register
 // @access  Public
 exports.registerUser = async (req, res) => {
-    // Only destructure fields expected from the current RegisterPage.jsx
     const { username, email, password, role } = req.body;
-
-    // Basic validation: Only require username, email, password for registration now
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Please enter all required fields: username, email, and password.' });
     }
-
     try {
         // Check for existing user by username or email
         let existingUser = await User.findOne({
@@ -46,19 +36,17 @@ exports.registerUser = async (req, res) => {
             let field = '';
             if (existingUser.username === username) field = 'Username';
             else if (existingUser.email === email.toLowerCase()) field = 'Email';
-            // Removed admissionNumber check as per your request to simplify registration
             return res.status(409).json({ message: `${field} is already registered.` });
         }
 
         // Create a new User instance (password will be hashed by pre-save hook)
         const newUser = new User({
             username,
-            email: email.toLowerCase(), // Store email in lowercase
+            email: email.toLowerCase(), 
             password,
-            role: role || 'user', // Default to 'user'
-            isVerified: false // User is unverified upon registration (REQUIRED for email verification flow)
+            role: role || 'user', 
+            isVerified: false 
         });
-
         // Generate OTP and set expiry for email verification using the method from User model
         const otp = newUser.generateEmailOTP();
 
@@ -81,14 +69,10 @@ exports.registerUser = async (req, res) => {
         };
 
         try {
-            // Your sendEmail function likely takes (to, subject, text, html) or similar.
-            // Adjust based on your actual sendEmail signature if needed.
             await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
             console.log(`Verification OTP email sent to ${newUser.email}`);
         } catch (emailError) {
             console.error('Error sending OTP email:', emailError);
-            // Log the email failure but don't prevent registration success message,
-            // as user might still try to verify or resend.
         }
 
         res.status(201).json({
@@ -130,8 +114,8 @@ exports.verifyEmail = async (req, res) => {
 
         // Mark user as verified, clear OTP fields
         user.isVerified = true;
-        user.otp = undefined;       // Clear OTP
-        user.otpExpires = undefined; // Clear expiry
+        user.otp = undefined;      
+        user.otpExpires = undefined; 
 
         await user.save(); // Save the updated user
 
@@ -204,8 +188,6 @@ exports.resendOtp = async (req, res) => {
 // @route   POST /api/login
 // @access  Public
 exports.loginUser = async (req, res) => {
-    //used for debugging of user and pass
-    // console.log("Received login data: ", req.body);
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -214,20 +196,16 @@ exports.loginUser = async (req, res) => {
 
     try {
         const user = await User.findOne({
+            //logical or to check both username and email
             $or: [
                 { username: username },
                 { email: username.toLowerCase() }
             ]
-        }).select('+password'); // Explicitly select password to compare
+        }).select('+password');
 
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials." });
         }
-
-        // --- IMPORTANT: Email verification check is REMOVED from login here, as requested. ---
-        // Users can now log in directly after registration, regardless of email verification status.
-        // The email verification is primarily for the registration flow and confirming email authenticity.
-
         const isMatch = await user.matchPassword(password);
 
         if (!isMatch) {
@@ -266,17 +244,15 @@ exports.forgotPassword = async (req, res) => {
         const user = await User.findOne({ email: email.toLowerCase() });
 
         if (!user) {
-            // Send a generic message to prevent email enumeration (don't reveal if email exists)
             return res.status(200).json({ success: true, message: 'If a user with that email exists, a password reset OTP has been sent.' });
         }
 
-        // Generate a new OTP using your existing method from the User model
+        
         const otp = user.generateEmailOTP();
-        // The generateEmailOTP method updates user.otp and user.otpExpires internally
+        
         await user.save({ validateBeforeSave: false }); // Save the user with the new OTP and expiry
 
         // Construct the reset URL using the OTP
-        // Ensure process.env.FRONTEND_URL is configured in your backend's .env file
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${otp}`;
 
         const mailOptions = {
@@ -301,7 +277,6 @@ exports.forgotPassword = async (req, res) => {
             res.status(200).json({ success: true, message: 'Password reset OTP sent to your email.' });
         } catch (emailError) {
             console.error('Error sending reset password email:', emailError);
-            // Clear the OTP and expiry if email sending fails to prevent invalid token usage
             user.otp = undefined;
             user.otpExpires = undefined;
             await user.save({ validateBeforeSave: false });
@@ -332,20 +307,19 @@ exports.resetPassword = async (req, res) => {
         const user = await User.findOne({
             otp: otp, // Find user by the exact OTP
             otpExpires: { $gt: Date.now() } // Check if OTP is still valid/not expired
-        }).select('+password'); // Explicitly select password to allow hashing the new one
+        }).select('+password');// Select password to allow hashing
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid or expired password reset OTP.' });
         }
 
-        // Set the new password
-        user.password = password; // Mongoose pre('save') middleware will hash this
-        // Clear the OTP fields after successful reset
+        
+        user.password = password; 
         user.otp = undefined;
         user.otpExpires = undefined;
-        user.isVerified = true; // Mark as verified if not already (good practice for password reset)
+        user.isVerified = true; 
 
-        await user.save(); // This will trigger the pre-save hook to hash the new password
+        await user.save(); 
 
         res.status(200).json({ success: true, message: 'Password reset successfully. You can now log in with your new password.' });
 

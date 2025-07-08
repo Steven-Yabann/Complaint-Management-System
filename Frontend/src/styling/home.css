@@ -82,14 +82,15 @@
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(900px, 1fr));
     gap: 2rem;
 }
 
 .feature-card {
+    display:block;
     padding: 2rem;
     border-radius: 8px;
-    background-color: #74a4ff;
+    background-color: #01fcf461;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
 }
@@ -97,6 +98,7 @@
 .feature-card:hover {
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
     font-size: large;
+    background-color: #02c3fed8;
 }
 
 .feature-icon {

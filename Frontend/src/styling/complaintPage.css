@@ -464,15 +464,16 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #5cb85c;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #5cb8aa;
     border-radius: 4px;
     background-color: #fff;
     cursor: pointer;
     outline: none;
     position: relative;
     margin-right: 8px;
+    margin-bottom: 10px;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     flex-shrink: 0;
 }
@@ -500,5 +501,10 @@
     font-size: 16px;
     color: #333;
     cursor: pointer;
+}
+.optional {
+    font-size: 0.9em;
+    color: #999;
+    margin-left: 5px; /* Space between label and optional text */
 }
 

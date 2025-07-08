@@ -411,7 +411,7 @@ const ComplaintPage = () => {
                                         onChange={handleChange}
                                     />
                                     <label htmlFor="isBuildingComplaint"> {/* Removed inline style */}
-                                        Is this complaint related to a specific building?
+                                        Is this complaint related to a specific building?<span className="optional">(Optional)</span>
                                     </label>
                                 </div>
 
@@ -465,18 +465,7 @@ const ComplaintPage = () => {
                                     </select>
                                 </div>
                             )}
-                            {isEditMode && userRole !== 'admin' && (
-                                <div className="form-group">
-                                    <label>Status</label>
-                                    <p className="form-static-value">{formData.status}</p>
-                                </div>
-                            )}
-                            {!isEditMode && (
-                                <div className="form-group">
-                                    <label>Status</label>
-                                    <p className="form-static-value">Open (Default)</p>
-                                </div>
-                            )}
+                            
 
                             <div className="form-group">
                                 <label htmlFor="priority">Priority</label>
@@ -494,7 +483,7 @@ const ComplaintPage = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="attachments">Attachments</label>
+                                <label htmlFor="attachments">Attachments<span className="optional">(Optional)</span></label>
                                 <input
                                     type="file"
                                     id="attachments"

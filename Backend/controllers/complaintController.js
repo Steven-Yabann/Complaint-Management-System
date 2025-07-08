@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
-const fs = require('fs');
+const fs = require('fs');// File system module for handling file operations
 const sendEmail = require('../utils/emailService');
 const {createNotification} = require('../controllers/notificationController');
 
@@ -135,6 +135,33 @@ exports.createComplaint = asyncHandler(async (req, res, next) => {
         } catch (emailError) {
             console.error('Error sending complaint submission email:', emailError);
         }
+        //for sending email to department admin
+        try{
+            const departmentAdmin =await User.findOne({department: department, role: 'admin'});
+            console.log('Searching for admin in department:', department); // Add this
+    console.log('Found department admin:', departmentAdmin);
+
+            if(departmentAdmin && departmentAdmin.email) {
+        const adminMailOptions = {
+            to: departmentAdmin.email,
+            subject: `New Complaint Submitted for ${existingDepartment.name} Department`,
+            html: `
+            <p>Hello ${departmentAdmin.username},</p>
+            <p>A new complaint has been submitted to the ${existingDepartment.name} department.</p>
+            <p>Please log in to the admin dashboard to review and manage this complaint.</p>
+                <p>Best regards,</p>
+                <p>Your Complaint Management System</p>
+            `
+        };
+        console.log(`Email sent to department admin (${departmentAdmin.email}) for new complaint.`);
+        await sendEmail(adminMailOptions.to, adminMailOptions.subject, '', adminMailOptions.html);
+                console.log(`Email sent to department admin (${departmentAdmin.email}) for new complaint.`);
+            } else {
+                console.warn(`No admin found or admin email not set for department ID: ${department}. Admin notification email not sent.`);
+            }
+        } catch (adminEmailError) {
+            console.error('Error sending new complaint notification email to department admin:', adminEmailError);
+        }
 
         res.status(201).json({
             success: true,
@@ -157,8 +184,7 @@ exports.getUserComplaints = asyncHandler(async (req, res, next) => {
     const complaints = await Complaint.find({ user: req.user.id })
         .populate('department', 'name')
         .populate('user', 'username email')
-        // --- No changes needed here, building is a string, not populated ---
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 }); //for sorting by most recent first
 
     res.status(200).json({
         success: true,
@@ -174,7 +200,6 @@ exports.getAllComplaints = asyncHandler(async (req, res, next) => {
     const complaints = await Complaint.find({})
         .populate('department', 'name')
         .populate('user', 'username email')
-        // --- No changes needed here, building is a string, not populated ---
         .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -190,8 +215,7 @@ exports.getAllComplaints = asyncHandler(async (req, res, next) => {
 exports.getComplaint = asyncHandler(async (req, res, next) => {
     const complaint = await Complaint.findById(req.params.id)
         .populate('department', 'name')
-        .populate('user', 'username email'); // Populate user to compare IDs accurately
-        // --- No changes needed here, building is a string, not populated ---
+        .populate('user', 'username email');
 
     if (!complaint) {
         return next(new ErrorResponse('Complaint not found', 404));
