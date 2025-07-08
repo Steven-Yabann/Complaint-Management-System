@@ -61,7 +61,7 @@ const ComplaintDetails = () => {
 		const token = localStorage.getItem('token');
 
 		try {
-			const response = await fetch(`http://localhost:4000/api/complaints/${id}/status`, {
+			const response = await fetch(`http://localhost:4000/api/complaints/${id}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -244,7 +244,10 @@ const ComplaintDetails = () => {
 											</select>
 											{updating && <span className="updating-text">Updating...</span>}
 										</div>
+										
+										
 									)}
+									
 								</div>
 
 								<div className="priority-container">
@@ -255,6 +258,8 @@ const ComplaintDetails = () => {
 								</div>
 							</div>
 						</div>
+
+						
 
 						<div className="detail-section">
 							<h2>Dates</h2>
