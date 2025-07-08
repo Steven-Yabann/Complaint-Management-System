@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
-const fs = require('fs');
+const fs = require('fs');// File system module for handling file operations
 const sendEmail = require('../utils/emailService');
 const {createNotification} = require('../controllers/notificationController');
 
@@ -157,8 +157,7 @@ exports.getUserComplaints = asyncHandler(async (req, res, next) => {
     const complaints = await Complaint.find({ user: req.user.id })
         .populate('department', 'name')
         .populate('user', 'username email')
-        // --- No changes needed here, building is a string, not populated ---
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 }); //for sorting by most recent first
 
     res.status(200).json({
         success: true,
@@ -174,7 +173,6 @@ exports.getAllComplaints = asyncHandler(async (req, res, next) => {
     const complaints = await Complaint.find({})
         .populate('department', 'name')
         .populate('user', 'username email')
-        // --- No changes needed here, building is a string, not populated ---
         .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -190,8 +188,7 @@ exports.getAllComplaints = asyncHandler(async (req, res, next) => {
 exports.getComplaint = asyncHandler(async (req, res, next) => {
     const complaint = await Complaint.findById(req.params.id)
         .populate('department', 'name')
-        .populate('user', 'username email'); // Populate user to compare IDs accurately
-        // --- No changes needed here, building is a string, not populated ---
+        .populate('user', 'username email');
 
     if (!complaint) {
         return next(new ErrorResponse('Complaint not found', 404));
