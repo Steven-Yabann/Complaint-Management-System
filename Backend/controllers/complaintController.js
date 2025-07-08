@@ -211,64 +211,86 @@ exports.getComplaint = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/complaints/:id/status
 // @access  Private (Admin)
 exports.updateComplaintStatus = asyncHandler(async (req, res, next) => {
-    const { status } = req.body;
+	const { status } = req.body;
 
-    if (!status) {
-        return next(new ErrorResponse('Please provide a status', 400));
-    }
+	if (!status) {
+		return next(new ErrorResponse('Please provide a status', 400));
+	}
 
-    const validStatuses = ['Open', 'In Progress', 'Resolved', 'Closed', 'Unresolved'];
-    if (!validStatuses.includes(status)) {
-        return next(new ErrorResponse('Invalid status provided', 400));
-    }
+	const validStatuses = ['Open', 'In Progress', 'Resolved', 'Closed', 'Unresolved'];
+	if (!validStatuses.includes(status)) {
+		return next(new ErrorResponse('Invalid status provided', 400));
+	}
 
-    const complaint = await Complaint.findById(req.params.id)
-        .populate('user', 'username email');
+	// Must be admin
+	if (req.user.role !== 'admin') {
+		return next(new ErrorResponse('Only administrators can update complaint status.', 403));
+	}
 
-    if (!complaint) {
-        return next(new ErrorResponse('Complaint not found', 404));
-    }
+	const complaint = await Complaint.findById(req.params.id).populate('user', 'username email');
 
-    if (req.user.role !== 'admin') {
-        return next(new ErrorResponse('Only administrators can update complaint status.', 403));
-    }
+	if (!complaint) {
+		return next(new ErrorResponse('Complaint not found', 404));
+	}
 
-    const oldStatus = complaint.status;
-    complaint.status = status;
-    complaint.updatedAt = Date.now();
+	const oldStatus = complaint.status;
+	complaint.status = status;
+	complaint.updatedAt = Date.now();
 
-    await complaint.save();
+	await complaint.save();
 
-    try {
-        if (complaint.user && complaint.user.email) {
-            const mailOptions = {
-                to: complaint.user.email,
-                subject: `Complaint Status Updated - #${complaint._id.toString().substring(0, 8)}`,
-                html: `
-                    <p>Hello ${complaint.user.username},</p>
-                    <p>The status of your complaint has been updated.</p>
-                    <p><strong>Complaint Title:</strong> ${complaint.title}</p>
-                    ${complaint.isBuildingComplaint && complaint.building ? `<p><strong>Building:</strong> ${complaint.building}</p>` : ''}
-                    <p><strong>Previous Status:</strong> ${oldStatus}</p>
-                    <p><strong>New Status:</strong> ${status}</p>
-                    <p><strong>Complaint ID:</strong> ${complaint._id}</p>
-                    <p>You can view the full details of your complaint by logging into your account.</p>
-                    <p>Thank you for your patience.</p>
-                    <p>Best regards,</p>
-                    <p>Your Complaint Management Team</p>
-                `,
-            };
-            await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
-        }
-    } catch (emailError) {
-        console.error('Error sending status update email:', emailError);
-    }
+	// Send email to user
+	try {
+		if (complaint.user?.email) {
+			const mailOptions = {
+				to: complaint.user.email,
+				subject: `Complaint Status Updated - #${complaint._id.toString().substring(0, 8)}`,
+				html: `
+					<p>Hello ${complaint.user.username},</p>
+					<p>The status of your complaint has been updated.</p>
+					<p><strong>Complaint Title:</strong> ${complaint.title}</p>
+					${complaint.isBuildingComplaint && complaint.building ? `<p><strong>Building:</strong> ${complaint.building}</p>` : ''}
+					<p><strong>Previous Status:</strong> ${oldStatus}</p>
+					<p><strong>New Status:</strong> ${status}</p>
+					<p><strong>Complaint ID:</strong> ${complaint._id}</p>
+                    ${(complaint.status === 'In Progress' || complaint.status === 'Open') 
+                        ? `<<p>You can view the full details of your complaint by logging into your account.</p>` 
+                        : ''
+                    }
+                    ${(complaint.status === 'Resolved' || complaint.status === 'Closed') 
+                        ? `<p>Thank you for your patience. You can provide feedback to us by logging into your account.</p>` 
+                        : ''
+                    }
+					<p>Thank you for your patience.</p>
+					<p>Best regards,<br>Your Complaint Management Team</p>
+				`,
+			};
 
-    res.status(200).json({
-        success: true,
-        message: 'Complaint status updated successfully!',
-        data: complaint
-    });
+			await sendEmail(mailOptions.to, mailOptions.subject, '', mailOptions.html);
+		}
+	} catch (emailError) {
+		console.error('Error sending status update email:', emailError);
+	}
+
+	// Create notification if status is "Resolved" or "Closed"
+	if ((status === 'Resolved' || status === 'Closed') && oldStatus !== status) {
+		try {
+			await createNotification(
+				complaint.user._id,
+				complaint._id,
+				`Your complaint "${complaint.title}" has been marked as ${status}.`,
+				'statusUpdate'
+			);
+		} catch (notifError) {
+			console.error('Error creating notification:', notifError);
+		}
+	}
+
+	res.status(200).json({
+		success: true,
+		message: 'Complaint status updated successfully!',
+		data: complaint
+	});
 });
 
 // @desc    Update a specific complaint by ID (for all fields editable by user/admin)

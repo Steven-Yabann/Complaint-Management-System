@@ -777,6 +777,193 @@ const SuperAdminDashboard = () => {
 		}
 	};
 
+	// Updated ModalForm Component in superAdminDashboard.jsx
+	const ModalForm = ({ type, item, departments, onSubmit, onCancel }) => {
+		const [formData, setFormData] = useState({
+			username: item?.username || '',
+			email: item?.email || '',
+			password: '',
+			role: item?.role || 'user',
+			department: item?.department?._id || '',
+			name: item?.name || '',
+			description: item?.description || ''
+		});
+
+		const handleSubmit = (e) => {
+			e.preventDefault();
+			
+			// Create submission data based on form type
+			let submitData = {};
+			
+			if (type === 'createAdmin') {
+				submitData = {
+					username: formData.username,
+					email: formData.email,
+					password: formData.password,
+					department: formData.department || null // Include department assignment
+				};
+			} else if (type === 'editUser') {
+				submitData = {
+					username: formData.username,
+					email: formData.email,
+					role: formData.role,
+					department: formData.department || null // Allow department updates
+				};
+			} else if (type === 'createDepartment' || type === 'editDepartment') {
+				submitData = {
+					name: formData.name,
+					description: formData.description
+				};
+			}
+
+			onSubmit(submitData);
+		};
+
+		const handleChange = (e) => {
+			const { name, value } = e.target;
+			setFormData(prev => ({
+				...prev,
+				[name]: value
+			}));
+		};
+
+		return (
+			<form onSubmit={handleSubmit} className="modal-form">
+				{(type === 'createAdmin' || type === 'editUser') && (
+					<>
+						<div className="form-group">
+							<label>Username</label>
+							<input
+								type="text"
+								name="username"
+								value={formData.username}
+								onChange={handleChange}
+								required
+							/>
+						</div>
+						
+						<div className="form-group">
+							<label>Email</label>
+							<input
+								type="email"
+								name="email"
+								value={formData.email}
+								onChange={handleChange}
+								required
+							/>
+						</div>
+
+						{type === 'createAdmin' && (
+							<>
+								<div className="form-group">
+									<label>Password</label>
+									<input
+										type="password"
+										name="password"
+										value={formData.password}
+										onChange={handleChange}
+										required
+										minLength="6"
+									/>
+								</div>
+								
+								<div className="form-group">
+									<label>Department</label>
+									<select
+										name="department"
+										value={formData.department}
+										onChange={handleChange}
+									>
+										<option value="">Select Department (Optional)</option>
+										{departments.map(dept => (
+											<option key={dept._id} value={dept._id}>
+												{dept.name}
+											</option>
+										))}
+									</select>
+									<small className="form-help">
+										Assign this admin to a specific department. Leave blank if admin should have access to all departments.
+									</small>
+								</div>
+							</>
+						)}
+
+						{type === 'editUser' && (
+							<>
+								<div className="form-group">
+									<label>Role</label>
+									<select
+										name="role"
+										value={formData.role}
+										onChange={handleChange}
+									>
+										<option value="user">User</option>
+										<option value="admin">Admin</option>
+									</select>
+								</div>
+								
+								{formData.role === 'admin' && (
+									<div className="form-group">
+										<label>Department</label>
+										<select
+											name="department"
+											value={formData.department}
+											onChange={handleChange}
+										>
+											<option value="">No Department</option>
+											{departments.map(dept => (
+												<option key={dept._id} value={dept._id}>
+													{dept.name}
+												</option>
+											))}
+										</select>
+										<small className="form-help">
+											Select the department this admin should manage.
+										</small>
+									</div>
+								)}
+							</>
+						)}
+					</>
+				)}
+
+				{(type === 'createDepartment' || type === 'editDepartment') && (
+					<>
+						<div className="form-group">
+							<label>Department Name</label>
+							<input
+								type="text"
+								name="name"
+								value={formData.name}
+								onChange={handleChange}
+								required
+							/>
+						</div>
+						
+						<div className="form-group">
+							<label>Description</label>
+							<textarea
+								name="description"
+								value={formData.description}
+								onChange={handleChange}
+								rows="4"
+							/>
+						</div>
+					</>
+				)}
+
+				<div className="modal-actions">
+					<button type="button" onClick={onCancel} className="btn btn-secondary">
+						Cancel
+					</button>
+					<button type="submit" className="btn btn-primary">
+						{type.includes('create') ? 'Create' : 'Update'}
+					</button>
+				</div>
+			</form>
+		);
+	};
+
 	return (
 		<div className="super-admin-container">
 			<nav className="super-admin-sidebar">
@@ -825,144 +1012,6 @@ const SuperAdminDashboard = () => {
 	);
 };
 
-// Modal Form Component - Updated to remove verified and department fields
-const ModalForm = ({ type, item, departments, onSubmit, onCancel }) => {
-	const [formData, setFormData] = useState({
-		username: item?.username || '',
-		email: item?.email || '',
-		password: '',
-		role: item?.role || 'user',
-		name: item?.name || '',
-		description: item?.description || ''
-	});
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		
-		// Create submission data based on form type
-		let submitData = {};
-		
-		if (type === 'createAdmin') {
-			submitData = {
-				username: formData.username,
-				email: formData.email,
-				password: formData.password
-			};
-		} else if (type === 'editUser') {
-			submitData = {
-				username: formData.username,
-				email: formData.email,
-				role: formData.role
-			};
-		} else if (type === 'createDepartment' || type === 'editDepartment') {
-			submitData = {
-				name: formData.name,
-				description: formData.description
-			};
-		}
-
-		onSubmit(submitData);
-	};
-
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setFormData(prev => ({
-			...prev,
-			[name]: value
-		}));
-	};
-
-	return (
-		<form onSubmit={handleSubmit} className="modal-form">
-			{(type === 'createAdmin' || type === 'editUser') && (
-				<>
-					<div className="form-group">
-						<label>Username</label>
-						<input
-							type="text"
-							name="username"
-							value={formData.username}
-							onChange={handleChange}
-							required
-						/>
-					</div>
-					
-					<div className="form-group">
-						<label>Email</label>
-						<input
-							type="email"
-							name="email"
-							value={formData.email}
-							onChange={handleChange}
-							required
-						/>
-					</div>
-
-					{type === 'createAdmin' && (
-						<div className="form-group">
-							<label>Password</label>
-							<input
-								type="password"
-								name="password"
-								value={formData.password}
-								onChange={handleChange}
-								required
-								minLength="6"
-							/>
-						</div>
-					)}
-
-					{type === 'editUser' && (
-						<div className="form-group">
-							<label>Role</label>
-							<select
-								name="role"
-								value={formData.role}
-								onChange={handleChange}
-							>
-								<option value="user">User</option>
-								<option value="admin">Admin</option>
-							</select>
-						</div>
-					)}
-				</>
-			)}
-
-			{(type === 'createDepartment' || type === 'editDepartment') && (
-				<>
-					<div className="form-group">
-						<label>Department Name</label>
-						<input
-							type="text"
-							name="name"
-							value={formData.name}
-							onChange={handleChange}
-							required
-						/>
-					</div>
-					
-					<div className="form-group">
-						<label>Description</label>
-						<textarea
-							name="description"
-							value={formData.description}
-							onChange={handleChange}
-							rows="4"
-						/>
-					</div>
-				</>
-			)}
-
-			<div className="modal-actions">
-				<button type="button" onClick={onCancel} className="btn btn-secondary">
-					Cancel
-				</button>
-				<button type="submit" className="btn btn-primary">
-					{type.includes('create') ? 'Create' : 'Update'}
-				</button>
-			</div>
-		</form>
-	);
-};
 
 export default SuperAdminDashboard;
