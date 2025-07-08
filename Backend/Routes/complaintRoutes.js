@@ -12,7 +12,8 @@ const {
     getComplaint,
     updateComplaint,
     deleteComplaint,
-    getAllComplaintsForAdmin
+    getAllComplaintsForAdmin,
+    updateComplaintStatus
 } = require('../controllers/complaintController');
 
 // --- User-specific complaint routes ---
@@ -27,10 +28,13 @@ router.route('/me')
 router.route('/admin/all')
     .get(protect, authorizeAdminWithDepartment(), getAllComplaintsForAdmin);
 
+
 // --- Routes for specific complaints by ID (common for both users and admins) ---
 router.route('/:id')
     .get(protect, getComplaint)
-    .put(protect, updateComplaint)
+    .put(protect, updateComplaintStatus)
     .delete(protect, deleteComplaint);
+
+
 
 module.exports = router;

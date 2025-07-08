@@ -1,3 +1,5 @@
+// Complete Updated adminDash.jsx with Super Admin Style PDF Download
+
 // frontend/src/pages/AdminDashboard.jsx
 
 import React, { useState, useEffect } from 'react';
@@ -218,8 +220,7 @@ const DashboardOverview = ({ complaints, adminDepartment }) => {
     );
 };
 
-
-const Analytics = ({ complaints }) => {
+const Analytics = ({ complaints, adminDepartment }) => {
     const [feedbackData, setFeedbackData] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -248,7 +249,7 @@ const Analytics = ({ complaints }) => {
         fetchFeedbackData();
     }, []);
 
-    // Calculate comprehensive analytics
+    // Calculate comprehensive analytics (same as before but department-specific)
     const getAnalytics = () => {
         if (!complaints.length) {
             return {
@@ -258,7 +259,6 @@ const Analytics = ({ complaints }) => {
                 satisfactionRate: 0,
                 monthlyTrends: [],
                 statusDistribution: [],
-                departmentBreakdown: [],
                 priorityDistribution: [],
                 recentActivity: [],
                 resolutionStats: {},
@@ -296,18 +296,6 @@ const Analytics = ({ complaints }) => {
         });
         const statusDistribution = Object.entries(statusCount).map(([status, count]) => ({
             status,
-            count,
-            percentage: ((count / total) * 100).toFixed(1)
-        }));
-
-        // Department breakdown
-        const deptCount = {};
-        complaints.forEach(c => {
-            const deptName = c.department?.name || 'Unknown';
-            deptCount[deptName] = (deptCount[deptName] || 0) + 1;
-        });
-        const departmentBreakdown = Object.entries(deptCount).map(([department, count]) => ({
-            department,
             count,
             percentage: ((count / total) * 100).toFixed(1)
         }));
@@ -355,7 +343,6 @@ const Analytics = ({ complaints }) => {
                 id: c._id,
                 title: c.title,
                 status: c.status,
-                department: c.department?.name || 'Unknown',
                 date: new Date(c.createdAt).toLocaleDateString(),
                 user: c.user?.username || 'Unknown'
             }));
@@ -367,7 +354,6 @@ const Analytics = ({ complaints }) => {
             satisfactionRate: feedbackStats.satisfactionRate,
             monthlyTrends,
             statusDistribution,
-            departmentBreakdown,
             priorityDistribution,
             recentActivity,
             resolutionStats: {
@@ -379,82 +365,147 @@ const Analytics = ({ complaints }) => {
         };
     };
 
-    // Download data as CSV
-    const downloadCSV = (data, filename) => {
-        setLoading(true);
-        try {
-            let csvContent = '';
-            
-            if (filename.includes('complaints')) {
-                // Complaints data
-                csvContent = "ID,Title,Status,Department,Priority,Created Date,User\n";
-                complaints.forEach(c => {
-                    csvContent += `"${c._id}","${c.title}","${c.status}","${c.department?.name || 'Unknown'}","${c.priority}","${new Date(c.createdAt).toLocaleDateString()}","${c.user?.username || 'Unknown'}"\n`;
-                });
-            } else if (filename.includes('department')) {
-                // Department breakdown
-                csvContent = "Department,Count,Percentage\n";
-                data.forEach(d => {
-                    csvContent += `"${d.department}","${d.count}","${d.percentage}%"\n`;
-                });
-            } else if (filename.includes('feedback')) {
-                // Feedback data
-                csvContent = "Complaint ID,Rating,Comments,Date\n";
-                feedbackData.forEach(f => {
-                    csvContent += `"${f.complaint?._id || 'Unknown'}","${f.rating}","${f.comments || 'No comments'}","${new Date(f.createdAt).toLocaleDateString()}"\n`;
-                });
-            }
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-        } catch (error) {
-            console.error('Error downloading CSV:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Download comprehensive analytics report
-    const downloadFullReport = () => {
+    // NEW: Download PDF function (same as Super Admin but department-specific)
+    const downloadPDF = async () => {
         setLoading(true);
         try {
             const analytics = getAnalytics();
             const date = new Date().toLocaleDateString();
+            const departmentName = adminDepartment || 'Unknown Department';
             
-            let reportContent = `Complaint Management System - Analytics Report\n`;
-            reportContent += `Generated on: ${date}\n\n`;
-            
-            reportContent += `SUMMARY STATISTICS\n`;
-            reportContent += `Total Complaints: ${analytics.total}\n`;
-            reportContent += `This Month: ${analytics.thisMonth}\n`;
-            reportContent += `Average Resolution Time: ${analytics.avgResolutionTime} days\n`;
-            reportContent += `Customer Satisfaction Rate: ${analytics.satisfactionRate}%\n\n`;
-            
-            reportContent += `STATUS DISTRIBUTION\n`;
-            analytics.statusDistribution.forEach(s => {
-                reportContent += `${s.status}: ${s.count} (${s.percentage}%)\n`;
-            });
-            
-            reportContent += `\nDEPARTMENT BREAKDOWN\n`;
-            analytics.departmentBreakdown.forEach(d => {
-                reportContent += `${d.department}: ${d.count} (${d.percentage}%)\n`;
-            });
-            
-            reportContent += `\nFEEDBACK STATISTICS\n`;
-            reportContent += `Total Feedback Received: ${analytics.feedbackStats.totalFeedback}\n`;
-            reportContent += `Average Rating: ${analytics.feedbackStats.averageRating}/5\n`;
-            reportContent += `Satisfaction Rate: ${analytics.feedbackStats.satisfactionRate}%\n`;
+            // Create HTML content for PDF
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${departmentName} Department - Complaint Analytics Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .summary { display: flex; justify-content: space-around; margin: 20px 0; }
+                        .summary-item { text-align: center; }
+                        .summary-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+                        .section { margin: 30px 0; }
+                        .section h2 { color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .footer { margin-top: 50px; text-align: center; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${departmentName} Department - Complaint Analytics Report</h1>
+                        <p>Generated on: ${date}</p>
+                        <p>Department: ${departmentName}</p>
+                    </div>
+                    
+                    <div class="summary">
+                        <div class="summary-item">
+                            <div class="summary-number">${analytics.total}</div>
+                            <div>Total Complaints</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number">${analytics.thisMonth}</div>
+                            <div>This Month</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number">${analytics.avgResolutionTime}</div>
+                            <div>Avg Resolution (Days)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number">${analytics.satisfactionRate}%</div>
+                            <div>Satisfaction Rate</div>
+                        </div>
+                    </div>
 
-            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `analytics-report-${date.replace(/\//g, '-')}.txt`;
-            link.click();
+                    <div class="section">
+                        <h2>Status Distribution</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Status</th><th>Count</th><th>Percentage</th></tr>
+                            </thead>
+                            <tbody>
+                                ${analytics.statusDistribution.map(s => 
+                                    `<tr><td>${s.status}</td><td>${s.count}</td><td>${s.percentage}%</td></tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Priority Distribution</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Priority</th><th>Count</th></tr>
+                            </thead>
+                            <tbody>
+                                ${analytics.priorityDistribution.map(p => 
+                                    `<tr><td>${p.priority}</td><td>${p.count}</td></tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Monthly Trends (Last 6 Months)</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Month</th><th>Complaints</th></tr>
+                            </thead>
+                            <tbody>
+                                ${analytics.monthlyTrends.map(m => 
+                                    `<tr><td>${m.month}</td><td>${m.complaints}</td></tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Recent Activity</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Title</th><th>Status</th><th>Date</th><th>User</th></tr>
+                            </thead>
+                            <tbody>
+                                ${analytics.recentActivity.map(a => 
+                                    `<tr><td>${a.title}</td><td>${a.status}</td><td>${a.date}</td><td>${a.user}</td></tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h2>Feedback Summary</h2>
+                        <table>
+                            <thead>
+                                <tr><th>Metric</th><th>Value</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Total Feedback Received</td><td>${analytics.feedbackStats.totalFeedback}</td></tr>
+                                <tr><td>Average Rating</td><td>${analytics.feedbackStats.averageRating}/5</td></tr>
+                                <tr><td>Customer Satisfaction Rate</td><td>${analytics.feedbackStats.satisfactionRate}%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="footer">
+                        <p>This report was generated automatically by the ${departmentName} Department Complaint Management System.</p>
+                        <p>Report includes data for complaints managed by the ${departmentName} department only.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            // Create and download PDF
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.print();
+
         } catch (error) {
-            console.error('Error downloading report:', error);
+            console.error('Error generating PDF:', error);
+            alert('Error generating PDF report');
         } finally {
             setLoading(false);
         }
@@ -468,14 +519,14 @@ const Analytics = ({ complaints }) => {
     return (
         <div className="analytics-container">
             <div className="analytics-header">
-                <h1>Analytics Dashboard</h1>
+                <h1>Analytics Dashboard - {adminDepartment} Department</h1>
                 <div className="analytics-actions">
                     <button 
                         className="download-btn primary"
-                        onClick={downloadFullReport}
+                        onClick={downloadPDF}
                         disabled={loading}
                     >
-                        {loading ? 'Generating...' : 'Download Full Report'}
+                        {loading ? 'Generating PDF...' : 'Download Department Report (PDF)'}
                     </button>
                 </div>
             </div>
@@ -506,12 +557,6 @@ const Analytics = ({ complaints }) => {
                 <div className="chart-container">
                     <div className="chart-header">
                         <h3>Monthly Trends (Last 6 Months)</h3>
-                        <button 
-                            className="download-btn secondary"
-                            onClick={() => downloadCSV(analytics.monthlyTrends, 'monthly-trends.csv')}
-                        >
-                            Export CSV
-                        </button>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={analytics.monthlyTrends}>
@@ -529,12 +574,6 @@ const Analytics = ({ complaints }) => {
                 <div className="chart-container">
                     <div className="chart-header">
                         <h3>Status Distribution</h3>
-                        <button 
-                            className="download-btn secondary"
-                            onClick={() => downloadCSV(analytics.statusDistribution, 'status-distribution.csv')}
-                        >
-                            Export CSV
-                        </button>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -557,28 +596,6 @@ const Analytics = ({ complaints }) => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Department Breakdown Chart */}
-                <div className="chart-container">
-                    <div className="chart-header">
-                        <h3>Department Breakdown</h3>
-                        <button 
-                            className="download-btn secondary"
-                            onClick={() => downloadCSV(analytics.departmentBreakdown, 'department-breakdown.csv')}
-                        >
-                            Export CSV
-                        </button>
-                    </div>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={analytics.departmentBreakdown}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="department" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="count" fill="#27ae60" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
                 {/* Priority Distribution Chart */}
                 <div className="chart-container">
                     <div className="chart-header">
@@ -598,58 +615,10 @@ const Analytics = ({ complaints }) => {
 
             {/* Data Tables Section */}
             <div className="tables-section">
-                {/* Department Performance Table */}
-                <div className="table-container">
-                    <div className="table-header">
-                        <h3>Department Performance</h3>
-                        <button 
-                            className="download-btn secondary"
-                            onClick={() => downloadCSV(analytics.departmentBreakdown, 'department-performance.csv')}
-                        >
-                            Export CSV
-                        </button>
-                    </div>
-                    <div className="analytics-table-wrapper">
-                        <table className="analytics-table">
-                            <thead>
-                                <tr>
-                                    <th>Department</th>
-                                    <th>Total Complaints</th>
-                                    <th>Percentage</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {analytics.departmentBreakdown.map((dept, index) => (
-                                    <tr key={index}>
-                                        <td>{dept.department}</td>
-                                        <td>{dept.count}</td>
-                                        <td>{dept.percentage}%</td>
-                                        <td>
-                                            <div className="progress-bar">
-                                                <div 
-                                                    className="progress-fill"
-                                                    style={{ width: `${dept.percentage}%` }}
-                                                ></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 {/* Recent Activity Table */}
                 <div className="table-container">
                     <div className="table-header">
-                        <h3>Recent Activity</h3>
-                        <button 
-                            className="download-btn secondary"
-                            onClick={() => downloadCSV(complaints, 'all-complaints.csv')}
-                        >
-                            Export All Complaints
-                        </button>
+                        <h3>Recent Activity - {adminDepartment} Department</h3>
                     </div>
                     <div className="analytics-table-wrapper">
                         <table className="analytics-table">
@@ -657,7 +626,6 @@ const Analytics = ({ complaints }) => {
                                 <tr>
                                     <th>Title</th>
                                     <th>Status</th>
-                                    <th>Department</th>
                                     <th>User</th>
                                     <th>Date</th>
                                 </tr>
@@ -671,7 +639,6 @@ const Analytics = ({ complaints }) => {
                                                 {activity.status}
                                             </span>
                                         </td>
-                                        <td>{activity.department}</td>
                                         <td>{activity.user}</td>
                                         <td>{activity.date}</td>
                                     </tr>
@@ -685,13 +652,7 @@ const Analytics = ({ complaints }) => {
                 {feedbackData.length > 0 && (
                     <div className="table-container">
                         <div className="table-header">
-                            <h3>Feedback Analytics</h3>
-                            <button 
-                                className="download-btn secondary"
-                                onClick={() => downloadCSV(feedbackData, 'feedback-data.csv')}
-                            >
-                                Export Feedback
-                            </button>
+                            <h3>Feedback Analytics - {adminDepartment} Department</h3>
                         </div>
                         <div className="analytics-table-wrapper">
                             <table className="analytics-table">
@@ -733,7 +694,6 @@ const Analytics = ({ complaints }) => {
     );
 };
 
-
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -744,7 +704,7 @@ const AdminDashboard = () => {
     const [adminName, setAdminName] = useState('Admin');
     const [adminDepartment, setAdminDepartment] = useState('');
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-    const [searchTerm, setSearchTerm] = useState(''); // New state for search
+    const [searchTerm, setSearchTerm] = useState('');
 
     const currentView = location.pathname.split('/').pop() || 'dashboard';
 
@@ -827,7 +787,6 @@ const AdminDashboard = () => {
                     filterComplaints(currentView, data.data || data); 
                     console.log(`Loaded ${data.count || 0} complaints for ${data.adminDepartment || 'unknown'} department`);
                     
-                    // Set department name from API response if we have it
                     if (data.adminDepartment) {
                         setAdminDepartment(data.adminDepartment);
                     }
@@ -850,7 +809,6 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         filterComplaints(currentView);
-        // Clear search term when changing views
         setSearchTerm('');
     }, [currentView, complaints]);
 
@@ -900,7 +858,6 @@ const AdminDashboard = () => {
                             to="/admin/dashboard" 
                             className={currentView === 'dashboard' ? 'active' : ''}
                         >
-                            
                             Dashboard
                         </Link>
                     </li>
@@ -909,7 +866,6 @@ const AdminDashboard = () => {
                             to="/admin/new" 
                             className={currentView === 'new' ? 'active' : ''}
                         >
-                            
                             New Complaints
                         </Link>
                     </li>
@@ -918,7 +874,6 @@ const AdminDashboard = () => {
                             to="/admin/in-progress" 
                             className={currentView === 'in-progress' ? 'active' : ''}
                         >
-                            
                             In-Progress
                         </Link>
                     </li>
@@ -927,7 +882,6 @@ const AdminDashboard = () => {
                             to="/admin/resolved" 
                             className={currentView === 'resolved' ? 'active' : ''}
                         >
-                            
                             Resolved
                         </Link>
                     </li>
@@ -936,7 +890,6 @@ const AdminDashboard = () => {
                             to="/admin/analytics" 
                             className={currentView === 'analytics' ? 'active' : ''}
                         >
-                            
                             Analytics
                         </Link>
                     </li>

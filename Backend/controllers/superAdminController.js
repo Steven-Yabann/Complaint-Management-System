@@ -6,6 +6,22 @@ const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/emailService');
 
+const checkAdminLimitInDepartment = async (departmentId, excludeUserId = null) => {
+	const query = {
+		role: 'admin',
+		department: departmentId
+	};
+	
+	// If updating an existing user, exclude them from the count
+	if (excludeUserId) {
+		query._id = { $ne: excludeUserId };
+	}
+	
+	const adminCount = await User.countDocuments(query);
+	return adminCount;
+};
+
+
 // @desc    Get all users with pagination and filtering
 // @route   GET /api/super-admin/users
 // @access  Private (Super Admin only)
@@ -52,6 +68,7 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 // @desc    Create admin user
 // @route   POST /api/super-admin/create-admin
 // @access  Private (Super Admin only)
+// Updated createAdmin function with limit validation
 exports.createAdmin = asyncHandler(async (req, res, next) => {
 	const { username, email, password, department } = req.body;
 	
@@ -68,6 +85,15 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 		const departmentExists = await Department.findById(department);
 		if (!departmentExists) {
 			return next(new ErrorResponse('Department not found', 400));
+		}
+		
+		// Check admin limit for the department
+		const currentAdminCount = await checkAdminLimitInDepartment(department);
+		if (currentAdminCount >= 2) {
+			return next(new ErrorResponse(
+				`Cannot assign admin to this department. Maximum of 2 admins allowed per department. Current count: ${currentAdminCount}`, 
+				400
+			));
 		}
 	}
 	
@@ -143,10 +169,7 @@ exports.createAdmin = asyncHandler(async (req, res, next) => {
 	});
 });
 
-// Updated updateUser function in superAdminController.js
-// @desc    Update user details
-// @route   PUT /api/super-admin/users/:id
-// @access  Private (Super Admin only)
+// Updated updateUser function with limit validation
 exports.updateUser = asyncHandler(async (req, res, next) => {
 	const { username, email, role, department } = req.body;
 	
@@ -161,11 +184,31 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse('Cannot change super admin role', 403));
 	}
 	
-	// Validate department if provided
-	if (department) {
+	// Validate department if provided and user is being assigned admin role
+	if (department && (role === 'admin' || (role === undefined && user.role === 'admin'))) {
 		const departmentExists = await Department.findById(department);
 		if (!departmentExists) {
 			return next(new ErrorResponse('Department not found', 400));
+		}
+		
+		// Check admin limit for the department (exclude current user if they're already an admin in this dept)
+		const currentAdminCount = await checkAdminLimitInDepartment(department, req.params.id);
+		if (currentAdminCount >= 2) {
+			return next(new ErrorResponse(
+				`Cannot assign admin to this department. Maximum of 2 admins allowed per department. Current count: ${currentAdminCount}`, 
+				400
+			));
+		}
+	}
+	
+	// Additional check: if user is being promoted to admin and assigned to a department
+	if (role === 'admin' && department && user.role !== 'admin') {
+		const currentAdminCount = await checkAdminLimitInDepartment(department);
+		if (currentAdminCount >= 2) {
+			return next(new ErrorResponse(
+				`Cannot assign admin to this department. Maximum of 2 admins allowed per department. Current count: ${currentAdminCount}`, 
+				400
+			));
 		}
 	}
 	
@@ -252,7 +295,6 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 		data: user
 	});
 });
-
 // @desc    Delete user
 // @route   DELETE /api/super-admin/users/:id
 // @access  Private (Super Admin only)
@@ -287,16 +329,21 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 exports.getAllDepartments = asyncHandler(async (req, res, next) => {
 	const departments = await Department.find().sort({ name: 1 });
 	
-	// Get complaint count for each department
+	// Get complaint count and admin info for each department
 	const departmentsWithStats = await Promise.all(
 		departments.map(async (dept) => {
 			const complaintCount = await Complaint.countDocuments({ department: dept._id });
 			const adminCount = await User.countDocuments({ department: dept._id, role: 'admin' });
+			const admins = await User.find({ department: dept._id, role: 'admin' }).select('username email');
 			
 			return {
 				...dept.toObject(),
 				complaintCount,
-				adminCount
+				adminCount,
+				maxAdmins: 2,
+				availableSlots: Math.max(0, 2 - adminCount),
+				isFull: adminCount >= 2,
+				admins
 			};
 		})
 	);
