@@ -199,8 +199,9 @@ const ComplaintPage = () => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, attachments: e.target.files });
-    };
+    const files = e.target.files.length > 0 ? Array.from(e.target.files) : null;
+    setFormData({ ...formData, attachments: files });
+};
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -465,8 +466,7 @@ const ComplaintPage = () => {
                                     </select>
                                 </div>
                             )}
-                            
-
+                               
                             <div className="form-group">
                                 <label htmlFor="priority">Priority</label>
                                 <select
