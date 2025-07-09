@@ -14,9 +14,10 @@ import SuperAdminDashboard from './pages/superAdminDashboard';
 import ProtectedRoute from './components/protectedRoutes';
 import ComplaintDetails from './pages/complaintDetails';
 import NotificationPage from './pages/notificationPage';
+import ConnectPage from './pages/connectPage';
 
-// Import your new components for password reset
-import ForgotPassword from './components/forgotPassword'; // Assuming you put it here
+
+import ForgotPassword from './components/forgotPassword'; 
 import ResetPassword from './components/resetPassword';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                 <Route path="/connect" element={<ConnectPage />} />
 
                 {/* New: Forgot Password and Reset Password Routes */}
                 <Route path="/forgot-password" element={<ForgotPassword />} />
